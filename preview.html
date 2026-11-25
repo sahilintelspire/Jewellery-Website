@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURA JEWELS | Handcrafted Luxury Boutique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* RESET & CORE VARIABLES */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    :root {
+      --bg: #0d0c0c;
+      --card-bg: rgba(26, 23, 23, 0.75);
+      --card-border: rgba(212, 175, 55, 0.22);
+      --gold-main: #D4AF37;
+      --gold-light: #F3E5AB;
+      --gold-glow: rgba(212, 175, 55, 0.35);
+      --rose: #F5B7B1;
+      --text: #FBF8F5;
+      --text-muted: #A39B95;
+      --emerald: #10B981;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    h1, h2, h3, h4, .serif {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      background: none;
+    }
+
+    /* LUXURY GLASS & SHIMMER EFFECTS */
+    .glass {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+    }
+    .glass-gold {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(243, 229, 171, 0.04) 100%);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+    }
+    .shimmer-text {
+      background: linear-gradient(120deg, #FAF6F0 0%, #D4AF37 35%, #FFF5D0 55%, #FAF6F0 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shine 6s linear infinite;
+    }
+    @keyframes shine {
+      to { background-position: 200% center; }
+    }
+
+    /* AMBIENT BACKGROUND GLOWS */
+    .glow-1 {
+      position: fixed;
+      top: -100px;
+      left: 20%;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+      filter: blur(60px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-2 {
+      position: fixed;
+      bottom: 10%;
+      right: 5%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(245, 183, 177, 0.12) 0%, transparent 70%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* TOP BAR */
+    .announcement-bar {
+      background: linear-gradient(90deg, #7F6207, #D4AF37, #7F6207);
+      color: #0c0b0b;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 8px 16px;
+      text-align: center;
+      position: relative;
+      z-index: 100;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 48px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+    }
+    .nav-brand {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .brand-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: var(--gold-main);
+    }
+    .brand-sub {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover {
+      color: var(--gold-main);
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .cart-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--gold-main);
+      color: var(--gold-light);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      transition: all 0.3s;
+    }
+    .cart-btn:hover {
+      background: var(--gold-main);
+      color: #000;
+      box-shadow: 0 0 20px var(--gold-glow);
+    }
+    .badge {
+      background: var(--gold-main);
+      color: #000;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+
+    /* HERO SECTION */
+    .hero {
+      position: relative;
+      z-index: 10;
+      min-height: 88vh;
+      display: flex;
+      align-items: center;
+      padding: 40px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 60px;
+      align-items: center;
+      width: 100%;
+    }
+    .pill-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-size: 64px;
+      line-height: 1.1;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+    .hero-title span {
+      font-style: italic;
+      font-weight: 400;
+    }
+    .hero-desc {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 540px;
+      margin-bottom: 36px;
+      line-height: 1.8;
+      font-weight: 300;
+    }
+    .hero-ctas {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .btn-primary {
+      padding: 16px 36px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #D4AF37, #AA820A);
+      color: #0c0b0b;
+      font-size: 12px;
+      letter-spacing: 2px;
+      font-weight: 700;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+      transition: all 0.3s;
+    }
+    .btn-primary:hover {
+      filter: brightness(1.15);
+      transform: translateY(-2px);
+      box-shadow: 0 0 35px rgba(212, 175, 55, 0.6);
+    }
+    .btn-whatsapp {
+      padding: 16px 32px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6EE7B7;
+      font-size: 12px;
+      letter-spacing: 2px;
+      font-weight: 700;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s;
+    }
+    .btn-whatsapp:hover {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10B981;
+      transform: translateY(-2px);
+    }
+    .trust-badges {
+      display: flex;
+      gap: 32px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 24px;
+    }
+    .badge-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 3D CANVAS BOX */
+    .canvas-3d-box {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      max-width: 500px;
+      margin: 0 auto;
+      border-radius: 32px;
+      overflow: hidden;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      box-shadow: 0 0 80px rgba(212, 175, 55, 0.18);
+      background: radial-gradient(circle at center, rgba(38, 32, 28, 0.6) 0%, rgba(13, 12, 12, 0.95) 100%);
+    }
+    #jewel-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+    #jewel-canvas:active {
+      cursor: grabbing;
+    }
+    .canvas-tag {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      z-index: 20;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      background: rgba(15, 14, 14, 0.7);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+    }
+    .canvas-bottom-pill {
+      position: absolute;
+      bottom: 18px;
+      left: 18px;
+      right: 18px;
+      z-index: 20;
+      padding: 14px 20px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(18, 16, 16, 0.85);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      backdrop-filter: blur(12px);
+    }
+
+    /* FILTER TABS */
+    .filter-section {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 18px 48px;
+      background: rgba(20, 18, 18, 0.4);
+    }
+    .filter-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+    }
+    .filter-btn {
+      padding: 10px 24px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: all 0.3s;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--gold-main);
+      color: #000;
+      border-color: var(--gold-main);
+    }
+
+    /* PRODUCT GRID */
+    .products-section {
+      padding: 80px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .section-header {
+      text-align: center;
+      max-width: 650px;
+      margin: 0 auto 60px auto;
+    }
+    .section-sub {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold-main);
+      font-weight: 700;
+      display: block;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+    }
+    .product-card {
+      border-radius: 28px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.4s ease;
+      position: relative;
+    }
+    .product-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--gold-main);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+    }
+    .img-box {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      position: relative;
+      background: #191616;
+    }
+    .img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .product-card:hover .img-box img {
+      transform: scale(1.08);
+    }
+    .card-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: var(--gold-main);
+      color: #000;
+    }
+    .card-rating {
+      font-size: 11px;
+      color: var(--gold-main);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .product-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      transition: color 0.3s;
+    }
+    .product-card:hover .product-title {
+      color: var(--gold-light);
+    }
+    .product-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    .card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 16px;
+    }
+    .price-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+    .price-old {
+      font-size: 12px;
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+    .price-curr {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--gold-main);
+    }
+    .add-btn {
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 700;
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--gold-main);
+      color: var(--gold-light);
+      transition: all 0.3s;
+    }
+    .add-btn:hover {
+      background: var(--gold-main);
+      color: #000;
+      box-shadow: 0 0 15px var(--gold-glow);
+    }
+
+    /* ARTISAN SECTION */
+    .artisan-section {
+      padding: 100px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .artisan-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 60px;
+      align-items: center;
+    }
+    .artisan-img-wrap {
+      position: relative;
+      border-radius: 32px;
+      overflow: hidden;
+      aspect-ratio: 4 / 5;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+    .artisan-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .quote-box {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(15, 14, 14, 0.85);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      backdrop-filter: blur(12px);
+      text-align: center;
+      font-style: italic;
+      font-size: 14px;
+      color: var(--gold-light);
+    }
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 30px;
+      margin-top: 30px;
+      text-align: center;
+    }
+    .stat-val {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--gold-main);
+    }
+    .stat-lbl {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* SLIDE OVER CART */
+    #cart-drawer {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    #cart-drawer.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .cart-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+    }
+    .cart-panel {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      max-width: 440px;
+      background: #141212;
+      border-left: 1px solid rgba(212, 175, 55, 0.3);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transform: translateX(100%);
+      transition: transform 0.35s ease;
+    }
+    #cart-drawer.open .cart-panel {
+      transform: translateX(0);
+    }
+    .cart-items-list {
+      flex: 1;
+      overflow-y: auto;
+      margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .cart-item {
+      display: flex;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      align-items: center;
+    }
+    .cart-item img {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid rgba(212, 175, 55, 0.2);
+      padding: 60px 48px 30px 48px;
+      background: #0f0d0d;
+    }
+    .footer-grid {
+      max-width: 1400px;
+      margin: 0 auto 40px auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 40px;
+    }
+    .footer-title {
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold-main);
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .footer-links a:hover {
+      color: var(--gold-main);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .navbar { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 30px 20px; }
+      .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+      .hero-title { font-size: 42px; }
+      .artisan-grid { grid-template-columns: 1fr; gap: 40px; }
+      .products-section, .filter-section, footer { padding-left: 20px; padding-right: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glows -->
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+
+  <!-- Announcement Bar -->
+  <div class="announcement-bar">
+    ✨ Free Luxury Gift Box on all Handcrafted Orders above ₹999 | Worldwide Express Shipping ✨
+  </div>
+
+  <!-- Luxury Navigation Bar -->
+  <nav class="navbar glass">
+    <div class="nav-brand">
+      <span class="brand-title serif shimmer-text">AURA</span>
+      <span class="brand-sub">Atelier</span>
+    </div>
+
+    <ul class="nav-links">
+      <li><a href="#collections">Collections</a></li>
+      <li><a href="#featured">Signature Drop</a></li>
+      <li><a href="#artisan">Artisan Story</a></li>
+      <li><a href="#custom">Bespoke Custom</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="cart-btn" onclick="toggleCart()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span>Bag</span>
+        <span class="badge" id="cart-badge">2</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION WITH 3D INTERACTIVE JEWEL -->
+  <section class="hero">
+    <div class="hero-grid">
+      
+      <!-- Left Column -->
+      <div>
+        <div class="pill-tag glass">
+          <span style="color:#D4AF37;">✦</span> 100% Hand-Sculpted with Devotion
+        </div>
+
+        <h1 class="hero-title serif">
+          Where Every Bead <br>
+          <span class="shimmer-text">Tells Your Secret Story.</span>
+        </h1>
+
+        <p class="hero-desc">
+          Meticulously hand-strung crystals, botanical preserved-resin pendants, and personalized couple bracelets. Designed for the romantic soul who cherishes bespoke artistry.
+        </p>
+
+        <div class="hero-ctas">
+          <a href="#featured" class="btn-primary">
+            <span>Explore Creations</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </a>
+
+          <a href="https://wa.me/918780125711?text=Hi!%20I%20love%20your%20handmade%20jewellery%20and%20want%20to%20place%20a%20custom%20order!" target="_blank" class="btn-whatsapp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <span>Customise on WhatsApp</span>
+          </a>
+        </div>
+
+        <div class="trust-badges">
+          <div class="badge-item">
+            <span style="color:#D4AF37;">✓</span> Skin-Friendly & Tarnish-Resistant
+          </div>
+          <div class="badge-item">
+            <span style="color:#D4AF37;">✓</span> Complimentary Velvet Gift Box
+          </div>
+        </div>
+      </div>
+
+      <!-- Right 3D Interactive Canvas -->
+      <div>
+        <div class="canvas-3d-box">
+          <div class="canvas-tag">
+            <div class="pulse-dot"></div>
+            <span>Interactive 3D Jewel (Move Mouse)</span>
+          </div>
+
+          <!-- Pure Canvas WebGL/Math Render -->
+          <canvas id="jewel-canvas"></canvas>
+
+          <div class="canvas-bottom-pill">
+            <div>
+              <p style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Signature Masterpiece</p>
+              <h4 class="serif" style="font-size: 16px; color: var(--gold-light); font-weight: 700;">Celestial Rose Quartz & Amethyst Orbit</h4>
+            </div>
+            <div style="text-align: right;">
+              <span style="font-size: 16px; font-weight: 700; color: #fff;">₹799</span>
+              <button onclick="addToCart('Celestial Rose Quartz Orbit', 799, 'https://images.unsplash.com/photo-1611591475152-478311382490?auto=format&fit=crop&w=300&q=80')" style="display: block; font-size: 11px; color: var(--gold-main); font-weight: 700; margin-top: 2px;">+ Quick Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FILTER BAR -->
+  <section class="filter-section" id="collections">
+    <div class="filter-container">
+      <button class="filter-btn active">All Handcrafted (18)</button>
+      <button class="filter-btn">Natural Crystal Beads</button>
+      <button class="filter-btn">Botanical Resin Charms</button>
+      <button class="filter-btn">Custom Initials & Names</button>
+      <button class="filter-btn">Dainty Pearl Chokers</button>
+      <button class="filter-btn">Magnetic Couple Bands</button>
+    </div>
+  </section>
+
+  <!-- SIGNATURE PRODUCT COLLECTION -->
+  <section class="products-section" id="featured">
+    <div class="section-header">
+      <span class="section-sub">Individually Sculpted On Order</span>
+      <h2 class="section-title serif">The Signature Drop</h2>
+      <p style="color: var(--text-muted); font-size: 14px; font-weight: 300;">Every single creation is hand-crafted with authentic minerals, organic resin, and tarnish-resistant gold wire.</p>
+    </div>
+
+    <div class="products-grid">
+      
+      <!-- Card 1 -->
+      <div class="product-card glass">
+        <div class="img-box">
+          <span class="card-tag">Bestseller</span>
+          <img src="https://images.unsplash.com/photo-1611591475152-478311382490?auto=format&fit=crop&w=600&q=80" alt="Rose Quartz Beaded Bracelet">
+        </div>
+        <div>
+          <div class="card-rating">★★★★★ <span style="color:#A39B95; font-size: 10px;">(48 reviews)</span></div>
+          <h3 class="product-title serif">Aurora Rose Quartz Tassel</h3>
+          <p class="product-desc">Genuine 8mm rose quartz healing crystals with 18k gold-plated accents and silky hand-tied tassel.</p>
+        </div>
+        <div class="card-bottom">
+          <div class="price-wrap">
+            <span class="price-old">₹999</span>
+            <span class="price-curr">₹699</span>
+          </div>
+          <button class="add-btn" onclick="addToCart('Aurora Rose Quartz Tassel', 699, 'https://images.unsplash.com/photo-1611591475152-478311382490?auto=format&fit=crop&w=600&q=80')">Add to Bag</button>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="product-card glass">
+        <div class="img-box">
+          <span class="card-tag" style="background: #E11D48; color: #fff;">Flower Art</span>
+          <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=600&q=80" alt="Resin Flower Pendant">
+        </div>
+        <div>
+          <div class="card-rating">★★★★★ <span style="color:#A39B95; font-size: 10px;">(32 reviews)</span></div>
+          <h3 class="product-title serif">Lavender Whisper Resin Pendant</h3>
+          <p class="product-desc">Real dried baby's breath flowers encased in crystal UV-safe resin with hypoallergenic delicate silver chain.</p>
+        </div>
+        <div class="card-bottom">
+          <div class="price-wrap">
+            <span class="price-old">₹1,199</span>
+            <span class="price-curr">₹799</span>
+          </div>
+          <button class="add-btn" onclick="addToCart('Lavender Whisper Resin Pendant', 799, 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=600&q=80')">Add to Bag</button>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="product-card glass">
+        <div class="img-box">
+          <span class="card-tag" style="background: #8B5CF6; color: #fff;">New Drop</span>
+          <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80" alt="Pearl Charm Bracelet">
+        </div>
+        <div>
+          <div class="card-rating">★★★★★ <span style="color:#A39B95; font-size: 10px;">(24 reviews)</span></div>
+          <h3 class="product-title serif">Baroque Pearl & Amethyst Charm</h3>
+          <p class="product-desc">Irregular natural baroque freshwater pearls combined with raw amethyst points for bohemian royalty.</p>
+        </div>
+        <div class="card-bottom">
+          <div class="price-wrap">
+            <span class="price-old">₹1,299</span>
+            <span class="price-curr">₹899</span>
+          </div>
+          <button class="add-btn" onclick="addToCart('Baroque Pearl & Amethyst Charm', 899, 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80')">Add to Bag</button>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="product-card glass">
+        <div class="img-box">
+          <span class="card-tag" style="background: #10B981; color: #000;">Couple Band</span>
+          <img src="https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?auto=format&fit=crop&w=600&q=80" alt="Custom Initial Pair">
+        </div>
+        <div>
+          <div class="card-rating">★★★★★ <span style="color:#A39B95; font-size: 10px;">(67 reviews)</span></div>
+          <h3 class="product-title serif">Bespoke Magnetic Couple Pair</h3>
+          <p class="product-desc">Two custom hand-woven cord bracelets featuring custom engraved initials and connecting magnetic heart bells.</p>
+        </div>
+        <div class="card-bottom">
+          <div class="price-wrap">
+            <span class="price-old">₹1,499</span>
+            <span class="price-curr">₹999</span>
+          </div>
+          <button class="add-btn" onclick="addToCart('Bespoke Magnetic Couple Pair', 999, 'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?auto=format&fit=crop&w=600&q=80')">Add to Bag</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ARTISAN STORY SECTION -->
+  <section class="artisan-section glass" id="artisan" style="border-radius: 40px; margin: 40px auto;">
+    <div class="artisan-grid">
+      <div class="artisan-img-wrap">
+        <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80" alt="Artisan hand making jewellery">
+        <div class="quote-box serif">
+          "Every knot, every crystal, every drop of resin is shaped by hand with infinite patience and love."
+        </div>
+      </div>
+
+      <div>
+        <span class="section-sub">The Soul Behind The Art</span>
+        <h2 class="serif" style="font-size: 46px; line-height: 1.15; margin-bottom: 20px;">
+          Handmade Isn't Just A Product. <br>
+          <span class="shimmer-text">It's A Piece Of Someone's Heart.</span>
+        </h2>
+        <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 16px; font-weight: 300;">
+          What started as a quiet passion on a study table has blossomed into a bespoke atelier. While fast-fashion factories print thousands of identical plastic copies, we sit with beads, wire, and resin to craft one singular creation at a time.
+        </p>
+        <p style="color: var(--text-muted); font-size: 14px; font-weight: 300;">
+          When you wear our jewellery, you wear mindful meditation, genuine natural healing crystals, and a story meant exclusively for you.
+        </p>
+
+        <div class="stat-row">
+          <div>
+            <div class="stat-val serif">100%</div>
+            <div class="stat-lbl">Hand Sculpted</div>
+          </div>
+          <div>
+            <div class="stat-val serif">500+</div>
+            <div class="stat-lbl">Smiles Delivered</div>
+          </div>
+          <div>
+            <div class="stat-val serif">Zero</div>
+            <div class="stat-lbl">Factory Clones</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CUSTOM BESPOKE ORDER BOX -->
+  <section class="products-section" id="custom" style="padding-top: 20px; text-align: center;">
+    <div class="glass-gold" style="border-radius: 36px; padding: 60px 30px; max-width: 900px; margin: 0 auto;">
+      <span style="font-size: 28px; display: block; margin-bottom: 10px;">✨</span>
+      <h2 class="serif" style="font-size: 38px; margin-bottom: 14px;">Want A Custom Piece Made Just For You?</h2>
+      <p style="color: var(--text-muted); font-size: 14px; max-width: 580px; margin: 0 auto 30px auto; font-weight: 300;">
+        Send us your wrist measurements, favorite gemstone colors, or reference photos. We will hand-make your custom dream piece and share behind-the-scenes progress videos!
+      </p>
+      <a href="https://wa.me/918780125711?text=Hi!%20I%20have%20a%20custom%20jewellery%20idea!" target="_blank" class="btn-whatsapp" style="background: #10B981; color: #000; font-weight: 800; box-shadow: 0 0 30px rgba(16,185,129,0.4);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+        <span>Chat Directly With The Artisan On WhatsApp</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- CART SLIDE-OVER DRAWER -->
+  <div id="cart-drawer">
+    <div class="cart-overlay" onclick="toggleCart()"></div>
+    <div class="cart-panel">
+      <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px;">
+          <h3 class="serif" style="font-size: 24px; font-weight: 700; color: var(--gold-light);">Your Treasure Bag</h3>
+          <button onclick="toggleCart()" style="color: var(--text-muted); font-size: 20px; padding: 4px 8px;">✕</button>
+        </div>
+
+        <div style="background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 10px 14px; margin-top: 16px; font-size: 11px; color: var(--gold-light);">
+          🎉 You unlocked <strong>FREE Luxury Velvet Gift Box</strong>!
+        </div>
+
+        <div class="cart-items-list" id="cart-items">
+          <!-- Items populated via JS -->
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="color: var(--text-muted); font-size: 13px;">Estimated Total:</span>
+          <span id="cart-subtotal" style="font-size: 22px; font-weight: 700; color: var(--gold-main);">₹1,498</span>
+        </div>
+        <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 16px;">Taxes & express doorstep delivery included.</p>
+
+        <button onclick="handleRazorpayCheckout()" class="btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;">
+          <span>Pay Securely via Razorpay (UPI / Cards)</span>
+        </button>
+
+        <button onclick="handleWhatsAppCheckout()" class="btn-whatsapp" style="width: 100%; justify-content: center;">
+          <span>Order via WhatsApp (Cash on Delivery)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LUXURY FOOTER (Required by Payment Gateways) -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <span class="brand-title serif shimmer-text" style="font-size: 24px; display: block; margin-bottom: 10px;">AURA</span>
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.7;">
+          Sculpting bespoke handmade resin souvenirs, gemstone bead bracelets, and heartfelt wearable poetry.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="footer-title">Handcrafted Collections</h4>
+        <ul class="footer-links">
+          <li><a href="#featured">Healing Crystal Bracelets</a></li>
+          <li><a href="#featured">Botanical Resin Flowers</a></li>
+          <li><a href="#featured">Bespoke Couple Bands</a></li>
+          <li><a href="#featured">Minimalist Chokers</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="footer-title">Customer Care Policies</h4>
+        <ul class="footer-links">
+          <li><a href="#">Shipping Policy (3-5 Business Days)</a></li>
+          <li><a href="#">7-Day Refund & Replacement Guarantee</a></li>
+          <li><a href="#">Jewellery Care Instructions</a></li>
+          <li><a href="#">Terms & Conditions</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="footer-title">Studio Contact</h4>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">📍 Handcrafted with love in Gujarat, India</p>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">📞 Phone/WhatsApp: +91 8780125711</p>
+        <p style="font-size: 13px; color: var(--text-muted);">✉️ Email: support@aurajewels.in</p>
+      </div>
+    </div>
+
+    <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px; text-align: center; font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; max-width: 1400px; margin: 0 auto;">
+      <span>© 2026 AURA JEWELS. All Rights Reserved. Handcrafted with love.</span>
+      <span>100% Secure Checkout • Razorpay Verified • COD Available</span>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT: 3D INTERACTIVE CANVAS & CART -->
+  <script>
+    // -------------------------------------------------------------
+    // PURE 3D MATHEMATICAL CANVAS ENGINE (Zero external dependencies!)
+    // Renders a rotating 3D Rose Quartz crystal gemstone with orbiting beads
+    // -------------------------------------------------------------
+    const canvas = document.getElementById('jewel-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * (window.devicePixelRatio || 1);
+      canvas.height = rect.height * (window.devicePixelRatio || 1);
+      ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // 3D Gemstone Geometry (Icosahedron 3D Coordinates)
+    const phi = (1 + Math.sqrt(5)) / 2;
+    const baseVertices = [
+      [-1,  phi, 0], [ 1,  phi, 0], [-1, -phi, 0], [ 1, -phi, 0],
+      [ 0, -1,  phi], [ 0,  1,  phi], [ 0, -1, -phi], [ 0,  1, -phi],
+      [ phi, 0, -1], [ phi, 0,  1], [-phi, 0, -1], [-phi, 0,  1]
+    ];
+    // Normalize and scale
+    const vertices = baseVertices.map(v => {
+      const len = Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+      return [v[0]/len * 90, v[1]/len * 90, v[2]/len * 90];
+    });
+
+    const faces = [
+      [0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11],
+      [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8],
+      [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9],
+      [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1]
+    ];
+
+    // Orbiting Bracelet Beads
+    const beadCount = 18;
+    const orbitRadius = 145;
+
+    let rotX = 0.3;
+    let rotY = 0;
+    let targetRotX = 0.3;
+    let targetRotY = 0;
+
+    // Mouse Tracking for Interactive 3D Orbit
+    window.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - (rect.left + rect.width / 2);
+      const y = e.clientY - (rect.top + rect.height / 2);
+      targetRotY = (x / rect.width) * 1.8;
+      targetRotX = -(y / rect.height) * 1.2;
+    });
+
+    // Stardust Sparkles
+    const sparkles = Array.from({ length: 30 }, () => ({
+      x: (Math.random() - 0.5) * 320,
+      y: (Math.random() - 0.5) * 320,
+      z: (Math.random() - 0.5) * 320,
+      size: Math.random() * 2 + 1,
+      speed: Math.random() * 0.02 + 0.005
+    }));
+
+    function render3D() {
+      const rect = canvas.getBoundingClientRect();
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+
+      ctx.clearRect(0, 0, rect.width, rect.height);
+
+      // Smooth mouse damping + continuous slow spin
+      rotY += (targetRotY - rotY) * 0.05 + 0.008;
+      rotX += (targetRotX - rotX) * 0.05;
+
+      const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+      const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+
+      // Render Floating Sparkles
+      sparkles.forEach(s => {
+        s.y -= s.speed * 15;
+        if (s.y < -160) s.y = 160;
+        const x1 = s.x * cosY - s.z * sinY;
+        const z1 = s.x * sinY + s.z * cosY;
+        const y2 = s.y * cosX - z1 * sinX;
+        const fov = 400 / (400 + z1);
+        ctx.fillStyle = "rgba(243, 229, 171, " + (0.3 + fov*0.5) + ")";
+        ctx.beginPath();
+        ctx.arc(cx + x1 * fov, cy + y2 * fov, s.size * fov, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Transform & Project Gemstone Vertices
+      const projected = vertices.map(v => {
+        const x1 = v[0] * cosY - v[2] * sinY;
+        const z1 = v[0] * sinY + v[2] * cosY;
+        const y2 = v[1] * cosX - z1 * sinX;
+        const z2 = v[1] * sinX + z1 * cosX;
+        const fov = 400 / (400 + z2);
+        return { x: cx + x1 * fov, y: cy + y2 * fov, z: z2 };
+      });
+
+      // Depth sort faces
+      const sortedFaces = faces.map(f => {
+        const avgZ = (projected[f[0]].z + projected[f[1]].z + projected[f[2]].z) / 3;
+        return { f, avgZ };
+      }).sort((a, b) => b.avgZ - a.avgZ);
+
+      // Draw Gemstone Crystal Faces with Lighting & Refraction
+      sortedFaces.forEach(item => {
+        const [i0, i1, i2] = item.f;
+        const p0 = projected[i0], p1 = projected[i1], p2 = projected[i2];
+
+        // Normal computation
+        const normalZ = (p1.x - p0.x)*(p2.y - p0.y) - (p1.y - p0.y)*(p2.x - p0.x);
+        if (normalZ > 0) { // Backface culling
+          const lightFactor = Math.min(Math.max(normalZ / 4000, 0.15), 1);
+          
+          // Shading: Rose quartz pink with gold sheen
+          const r = Math.floor(220 + lightFactor * 35);
+          const g = Math.floor(140 + lightFactor * 60);
+          const b = Math.floor(160 + lightFactor * 60);
+          
+          ctx.beginPath();
+          ctx.moveTo(p0.x, p0.y);
+          ctx.lineTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.closePath();
+
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.75)`;
+          ctx.fill();
+
+          ctx.strokeStyle = "rgba(255, 245, 210, 0.45)";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      });
+
+      // Draw Orbiting Beaded Bracelet (Gold + Crystal pearls)
+      const beads = [];
+      const orbitTilt = 0.45;
+      for (let i = 0; i < beadCount; i++) {
+        const angle = (i / beadCount) * Math.PI * 2 + rotY * 1.5;
+        const bx = Math.cos(angle) * orbitRadius;
+        const bz = Math.sin(angle) * orbitRadius;
+        const by = Math.sin(angle) * 35 * Math.sin(orbitTilt);
+
+        const x1 = bx * cosY - bz * sinY;
+        const z1 = bx * sinY + bz * cosY;
+        const y2 = by * cosX - z1 * sinX;
+        const z2 = by * sinX + z1 * cosX;
+        const fov = 400 / (400 + z2);
+
+        beads.push({
+          x: cx + x1 * fov,
+          y: cy + y2 * fov,
+          z: z2,
+          r: 9 * fov,
+          isGold: i % 2 === 0
+        });
+      }
+
+      // Sort beads by depth and draw
+      beads.sort((a, b) => b.z - a.z);
+      beads.forEach(b => {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, Math.max(b.r, 2), 0, Math.PI * 2);
+        if (b.isGold) {
+          const grad = ctx.createRadialGradient(b.x - b.r*0.3, b.y - b.r*0.3, b.r*0.1, b.x, b.y, b.r);
+          grad.addColorStop(0, '#FFF5D0');
+          grad.addColorStop(0.5, '#D4AF37');
+          grad.addColorStop(1, '#664C00');
+          ctx.fillStyle = grad;
+        } else {
+          // Purple/Pink Crystal bead
+          const grad = ctx.createRadialGradient(b.x - b.r*0.3, b.y - b.r*0.3, b.r*0.1, b.x, b.y, b.r);
+          grad.addColorStop(0, '#FFFFFF');
+          grad.addColorStop(0.4, '#E8C5E5');
+          grad.addColorStop(1, '#78437D');
+          ctx.fillStyle = grad;
+        }
+        ctx.fill();
+        ctx.strokeStyle = "rgba(0,0,0,0.3)";
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      });
+
+      requestAnimationFrame(render3D);
+    }
+    render3D();
+
+    // -------------------------------------------------------------
+    // CART & CHECKOUT LOGIC
+    // -------------------------------------------------------------
+    let cart = [
+      { name: 'Aurora Rose Quartz Tassel', price: 699, qty: 1, img: 'https://images.unsplash.com/photo-1611591475152-478311382490?auto=format&fit=crop&w=200&q=80' },
+      { name: 'Lavender Whisper Resin Pendant', price: 799, qty: 1, img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=200&q=80' }
+    ];
+
+    function toggleCart() {
+      const drawer = document.getElementById('cart-drawer');
+      drawer.classList.toggle('open');
+      renderCartItems();
+    }
+
+    function addToCart(name, price, img) {
+      cart.push({ name, price, qty: 1, img });
+      updateBadge();
+      toggleCart();
+    }
+
+    function updateBadge() {
+      document.getElementById('cart-badge').innerText = cart.length;
+    }
+
+    function renderCartItems() {
+      updateBadge();
+      const list = document.getElementById('cart-items');
+      let total = 0;
+      let html = '';
+      
+      cart.forEach((item, index) => {
+        total += item.price * item.qty;
+        html += `
+          <div class="cart-item">
+            <img src="${item.img}" alt="${item.name}">
+            <div style="flex:1;">
+              <h5 style="font-size:13px; font-weight:600; color:#fff;">${item.name}</h5>
+              <p style="font-size:11px; color:var(--text-muted);">Qty: ${item.qty}</p>
+              <p style="font-size:13px; font-weight:700; color:var(--gold-main); margin-top:2px;">₹${item.price}</p>
+            </div>
+            <button onclick="removeItem(${index})" style="color: #999; font-size:14px; padding:6px;">✕</button>
+          </div>
+        `;
+      });
+      list.innerHTML = html;
+      document.getElementById('cart-subtotal').innerText = '₹' + total;
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      renderCartItems();
+    }
+
+    function handleRazorpayCheckout() {
+      alert("✨ Razorpay Checkout Triggered!\n(Once integrated with your API keys, the secure Razorpay payment modal opens here with UPI/GPay/PhonePe/Cards).");
+    }
+
+    function handleWhatsAppCheckout() {
+      const total = document.getElementById('cart-subtotal').innerText;
+      let msg = "Hi AURA Jewels! I would like to place an order for handcrafted jewellery. Total: " + total;
+      window.open("https://wa.me/918780125711?text=" + encodeURIComponent(msg), "_blank");
+    }
+
+    renderCartItems();
+  </script>
+</body>
+</html>
