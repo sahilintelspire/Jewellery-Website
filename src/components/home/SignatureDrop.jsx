@@ -10,7 +10,7 @@ export default function SignatureDrop() {
     activeTab === 'all' ? PRODUCTS : PRODUCTS.filter((p) => p.category === activeTab);
 
   return (
-    <section className="py-20 px-6 lg:px-16 max-w-7xl mx-auto">
+    <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto">
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
         <span className="text-xs uppercase tracking-[0.25em] text-gold-600 font-semibold flex items-center justify-center gap-1.5">
@@ -43,7 +43,7 @@ export default function SignatureDrop() {
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {filteredProducts.map((product, index) => (
           <ProductCard key={product.id} product={product} index={index} />
         ))}

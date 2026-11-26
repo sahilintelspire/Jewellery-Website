@@ -41,32 +41,32 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="relative min-h-[96vh] flex flex-col justify-between pt-6 pb-12 px-4 sm:px-6 lg:px-16 overflow-hidden silk-mesh-bg transition-colors duration-700">
+    <section className="relative min-h-[calc(100vh-80px)] lg:min-h-[94vh] flex flex-col justify-between pt-4 sm:pt-6 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-16 overflow-hidden silk-mesh-bg transition-colors duration-700">
       
       {/* 1. TOP MOTION SITES PILL SWITCHER (Matching the Demo Video from Instagram!) */}
       <div className="flex items-center justify-center pt-1 z-30">
-        <div className="inline-flex p-1.5 rounded-full bg-white/80 backdrop-blur-xl border border-gold-400/50 shadow-md">
+        <div className="inline-flex p-1 sm:p-1.5 rounded-full bg-white/85 backdrop-blur-xl border border-gold-400/50 shadow-md max-w-full">
           <button
             onClick={() => setViewMode('showcase')}
-            className={`px-6 py-2 rounded-full text-xs uppercase tracking-[0.2em] font-bold transition-all flex items-center gap-2 ${
+            className={`px-3.5 sm:px-6 py-2 rounded-full text-[10px] sm:text-xs uppercase tracking-[0.1em] sm:tracking-[0.2em] font-bold transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
               viewMode === 'showcase'
                 ? 'btn-gold-mockup'
                 : 'text-espresso/70 hover:text-espresso'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5 flex-shrink-0" />
             <span>3D Atelier</span>
           </button>
 
           <button
             onClick={() => setViewMode('process')}
-            className={`px-6 py-2 rounded-full text-xs uppercase tracking-[0.2em] font-bold transition-all flex items-center gap-2 ${
+            className={`px-3.5 sm:px-6 py-2 rounded-full text-[10px] sm:text-xs uppercase tracking-[0.1em] sm:tracking-[0.2em] font-bold transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
               viewMode === 'process'
                 ? 'bg-espresso text-white shadow-md'
                 : 'text-espresso/70 hover:text-espresso'
             }`}
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
             <span>The Craft Process</span>
           </button>
         </div>
@@ -75,16 +75,16 @@ export default function HeroSection() {
       {/* 2. DYNAMIC CONTENT: SHOWCASE MODE vs PROCESS STORY MODE */}
       {viewMode === 'showcase' ? (
         /* MODE A: 3D ATELIER SHOWCASE */
-        <div className="max-w-4xl mx-auto text-center space-y-4 pt-4 z-20 transition-all duration-500">
-          <h1 className="font-serif-lux text-5xl sm:text-6xl lg:text-[76px] font-bold tracking-tight text-espresso leading-[1.06]">
+        <div className="max-w-4xl mx-auto text-center space-y-3 sm:space-y-4 pt-3 sm:pt-4 z-20 transition-all duration-500">
+          <h1 className="font-serif-lux text-4xl sm:text-6xl lg:text-[76px] font-bold tracking-tight text-espresso leading-[1.08]">
             Elegance Handcrafted For You
           </h1>
 
-          <p className="text-espresso/75 text-sm sm:text-base max-w-2xl mx-auto font-light leading-relaxed">
+          <p className="text-espresso/75 text-xs sm:text-base max-w-2xl mx-auto font-light leading-relaxed px-2 sm:px-0">
             Each piece thoughtfully sculpted by hand with authentic crystals, pearls, and artisanal love.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-1">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-1">
             <Link
               to="/collections"
               className="w-full sm:w-auto px-9 py-3.5 rounded-full btn-gold-mockup text-xs uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-2"

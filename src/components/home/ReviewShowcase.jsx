@@ -33,7 +33,7 @@ export default function ReviewShowcase() {
   ];
 
   return (
-    <section className="py-20 px-6 lg:px-16 max-w-7xl mx-auto">
+    <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto">
       <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
         <span className="text-xs uppercase tracking-[0.25em] text-gold-600 font-semibold">
           Customer Love Stories

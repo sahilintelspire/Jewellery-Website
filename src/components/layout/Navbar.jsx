@@ -64,24 +64,24 @@ export default function Navbar() {
   return (
     <>
       {/* 1. TOP ANNOUNCEMENT BAR */}
-      <div className="bg-gradient-to-r from-gold-700 via-gold-500 to-gold-700 text-white text-[11px] sm:text-xs tracking-[0.2em] uppercase font-semibold py-2 px-4 text-center relative z-50 shadow-sm flex items-center justify-center gap-2">
+      <div className="bg-gradient-to-r from-gold-700 via-gold-500 to-gold-700 text-white text-[10px] sm:text-xs tracking-[0.06em] sm:tracking-[0.2em] uppercase font-semibold py-1.5 sm:py-2 px-3 sm:px-4 text-center relative z-50 shadow-sm flex items-center justify-center gap-1.5 sm:gap-2 leading-snug">
         <Sparkles className="w-3.5 h-3.5 animate-pulse text-gold-200 hidden sm:inline" />
         <span>
-          Free Velvet Gift Box Above ₹999 • Use Code <strong className="underline">AURA10</strong> for 10% Off
+          Free Velvet Gift Box Above ₹999 • Code <strong className="underline">AURA10</strong> for 10% Off
         </span>
         <Sparkles className="w-3.5 h-3.5 animate-pulse text-gold-200 hidden sm:inline" />
       </div>
 
       {/* 2. MAIN LUXURY NAVBAR */}
-      <nav className="sticky top-0 z-40 bg-ivory-100/90 backdrop-blur-md border-b border-gold-300/40 px-4 sm:px-6 lg:px-16 py-3.5 transition-all duration-300">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <nav className="sticky top-0 z-40 bg-ivory-100/95 backdrop-blur-md border-b border-gold-300/40 px-3 sm:px-6 lg:px-16 py-3 sm:py-3.5 transition-all duration-300">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Brand Logo: AURA Atelier */}
-          <Link to="/" className="flex items-baseline gap-2 group flex-shrink-0">
-            <span className="font-serif-lux text-3xl lg:text-4xl font-bold tracking-[0.25em] gold-metallic-text group-hover:brightness-110 transition uppercase">
+          <Link to="/" className="flex items-baseline gap-1.5 sm:gap-2 group flex-shrink-0">
+            <span className="font-serif-lux text-2xl sm:text-3xl lg:text-4xl font-bold tracking-[0.16em] sm:tracking-[0.25em] gold-metallic-text group-hover:brightness-110 transition uppercase">
               AURA
             </span>
-            <span className="text-[10px] tracking-[0.3em] uppercase text-gold-700 font-semibold hidden sm:inline">
+            <span className="text-[9px] sm:text-[10px] tracking-[0.25em] sm:tracking-[0.3em] uppercase text-gold-700 font-semibold hidden sm:inline">
               Atelier
             </span>
           </Link>
@@ -111,13 +111,13 @@ export default function Navbar() {
           </div>
 
           {/* Right Actions: Search, Account/Auth, Wishlist, Bag */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1 sm:gap-3">
             
             {/* Instant Search Button */}
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="p-2.5 rounded-full hover:bg-gold-50 text-espresso hover:text-gold-700 transition"
+              className="p-2 sm:p-2.5 rounded-full hover:bg-gold-50 text-espresso hover:text-gold-700 transition"
               title="Search Jewellery"
               aria-label="Search Jewellery"
             >
@@ -207,7 +207,7 @@ export default function Navbar() {
             {/* Wishlist Link */}
             <Link
               to="/wishlist"
-              className="p-2.5 rounded-full hover:bg-gold-50 text-espresso hover:text-rosequartz-500 transition relative"
+              className="p-2 sm:p-2.5 rounded-full hover:bg-gold-50 text-espresso hover:text-rosequartz-500 transition relative"
               title="My Wishlist"
               aria-label="My Wishlist"
             >
@@ -217,7 +217,7 @@ export default function Navbar() {
                 }`}
               />
               {wishlist.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-rosequartz-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-ivory-100 shadow-sm">
+                <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 bg-rosequartz-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-ivory-100 shadow-sm">
                   {wishlist.length}
                 </span>
               )}
@@ -226,7 +226,7 @@ export default function Navbar() {
             {/* Shopping Bag Button (Opens Drawer) */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-full btn-gold-mockup text-xs uppercase tracking-wider font-bold transition group"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full btn-gold-mockup text-xs uppercase tracking-wider font-bold transition group"
             >
               <ShoppingBag className="w-4 h-4 group-hover:scale-110 transition-transform" />
               <span className="hidden sm:inline">Bag</span>

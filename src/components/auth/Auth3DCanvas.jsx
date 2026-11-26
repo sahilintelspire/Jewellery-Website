@@ -394,7 +394,7 @@ function Auth3DCanvas({
       if (!w || !h) return;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
-      camera.position.z = w / h < 0.85 ? 8.2 : 6.6;
+      camera.position.z = w / h < 0.85 ? 8.2 : w < 640 ? 6.4 : 6.6;
       camera.updateProjectionMatrix();
     };
     const ro = new ResizeObserver(resize);
@@ -526,7 +526,7 @@ function Auth3DCanvas({
   };
 
   return (
-    <div className="relative w-full h-full min-h-[380px] lg:min-h-[540px] flex items-center justify-center select-none">
+    <div className="relative w-full h-[230px] sm:h-[320px] lg:h-[520px] flex items-center justify-center select-none">
       {/* Warm Rose & Champagne Glow Halo (Pure gradient, no heavy GPU blur recomposition) */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -537,21 +537,21 @@ function Auth3DCanvas({
       />
 
       {/* Contact Shadow */}
-      <div className="absolute bottom-14 w-56 h-5 rounded-[100%] bg-[#735149]/16 blur-lg pointer-events-none" />
+      <div className="absolute bottom-8 sm:bottom-14 w-44 sm:w-56 h-4 sm:h-5 rounded-[100%] bg-[#735149]/16 blur-lg pointer-events-none" />
 
       {/* Transparent WebGL Mount */}
       <div
         ref={mountRef}
-        className="w-full h-full min-h-[380px] lg:min-h-[540px] relative"
+        className="w-full h-full relative"
         style={{ background: "transparent" }}
         role="img"
         aria-label="Interactive 3D Crystal Heart and Golden Orbital Rings Jewellery Emblem"
       />
 
       {/* Interactive Status Pill */}
-      <div className="absolute bottom-4 z-20 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/95 border border-gold-400/50 text-[10px] uppercase tracking-[0.2em] font-bold text-espresso shadow-md pointer-events-none transition-all duration-300">
+      <div className="absolute bottom-2 sm:bottom-4 z-20 max-w-[92%] text-center inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-white/95 border border-gold-400/50 text-[9px] sm:text-[10px] uppercase tracking-[0.09em] sm:tracking-[0.2em] font-bold text-espresso shadow-md pointer-events-none transition-all duration-300 leading-tight">
         <span
-          className={`w-2 h-2 rounded-full ${
+          className={`w-2 h-2 rounded-full flex-shrink-0 ${
             focusedField === "password"
               ? "bg-amber-500 animate-pulse"
               : "bg-emerald-500 animate-ping"

@@ -228,16 +228,16 @@ export default function RazorpayMockModal({
             <button
               type="submit"
               disabled={processing}
-              className="w-full py-4 rounded-full glass-gold-btn text-xs uppercase tracking-[0.18em] font-bold shadow-luxury flex items-center justify-center gap-2 disabled:opacity-75"
+              className="w-full py-4 px-5 rounded-full glass-gold-btn text-xs uppercase tracking-[0.14em] sm:tracking-[0.18em] font-bold shadow-luxury flex items-center justify-center gap-2 disabled:opacity-75"
             >
               {processing ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
                   <span>Verifying Payment...</span>
                 </>
               ) : (
                 <>
-                  <Lock className="w-4 h-4" />
+                  <Lock className="w-4 h-4 flex-shrink-0" />
                   <span>Pay ₹{amount.toLocaleString('en-IN')} Securely</span>
                 </>
               )}

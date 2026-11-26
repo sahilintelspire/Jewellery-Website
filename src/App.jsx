@@ -168,7 +168,7 @@ export default function App() {
         href="https://wa.me/918780125711?text=Hi!%20I%20have%20a%20question%20about%20your%20handmade%20jewellery!"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-40 px-4 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider shadow-2xl flex items-center gap-2 hover:scale-105 transition-all duration-300 border border-emerald-400/40"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 p-3.5 sm:px-4 sm:py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider shadow-2xl flex items-center gap-2 hover:scale-105 transition-all duration-300 border border-emerald-400/40"
         title="Chat with the Artisan on WhatsApp"
       >
         <MessageCircle className="w-5 h-5 fill-white/10" />

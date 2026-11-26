@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 
 export default function CustomBespokeBanner() {
   return (
-    <section className="py-20 px-6 lg:px-16">
-      <div className="max-w-5xl mx-auto rounded-3xl bg-gradient-to-r from-gold-100 via-ivory-100 to-rosequartz-100 p-8 sm:p-14 border border-gold-300 shadow-luxury text-center relative overflow-hidden">
+    <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-16">
+      <div className="max-w-5xl mx-auto rounded-3xl bg-gradient-to-r from-gold-100 via-ivory-100 to-rosequartz-100 p-6 sm:p-14 border border-gold-300 shadow-luxury text-center relative overflow-hidden">
         
         {/* Glow circles */}
         <div className="absolute -top-10 -right-10 w-48 h-48 bg-gold-400/20 rounded-full blur-3xl pointer-events-none" />

@@ -155,9 +155,9 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="min-h-screen py-10 px-6 lg:px-16 max-w-7xl mx-auto">
+    <div className="min-h-screen py-6 sm:py-10 px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs text-espresso/60 mb-8 uppercase tracking-wider">
+      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-espresso/60 mb-6 sm:mb-8 uppercase tracking-wider">
         <Link to="/" className="hover:text-gold-700">
           Home
         </Link>
@@ -169,7 +169,7 @@ export default function ProductDetailPage() {
         <span className="text-espresso font-semibold truncate">{product.name}</span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
         {/* Left: Product Images Gallery */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -264,7 +264,7 @@ export default function ProductDetailPage() {
             <label className="text-xs uppercase tracking-wider text-espresso/80 font-bold block">
               1. Select Size / Length:
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {product.sizes.map((sz) => (
                 <button
                   key={sz}
@@ -357,9 +357,9 @@ export default function ProductDetailPage() {
             <button
               type="button"
               onClick={handleBuyNow}
-              className="w-full py-4 rounded-full glass-gold-btn text-xs uppercase tracking-[0.18em] font-bold shadow-luxury flex items-center justify-center gap-2"
+              className="w-full py-4 px-5 sm:px-6 rounded-full glass-gold-btn text-[11px] sm:text-xs uppercase tracking-[0.14em] sm:tracking-[0.18em] font-bold shadow-luxury flex items-center justify-center gap-2 text-center"
             >
-              <Zap className="w-4 h-4" />
+              <Zap className="w-4 h-4 flex-shrink-0" />
               <span>Buy Now • ₹{(product.price * quantity).toLocaleString('en-IN')}</span>
             </button>
 
@@ -367,10 +367,10 @@ export default function ProductDetailPage() {
             <button
               type="button"
               onClick={handleWhatsAppCustom}
-              className="w-full py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs uppercase tracking-wider font-bold shadow-sm flex items-center justify-center gap-2 transition"
+              className="w-full py-3.5 px-5 sm:px-6 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] sm:text-xs uppercase tracking-[0.1em] sm:tracking-wider font-bold shadow-sm flex items-center justify-center gap-2 text-center transition"
             >
-              <MessageCircle className="w-4 h-4" />
-              <span>Discuss & Order This on WhatsApp</span>
+              <MessageCircle className="w-4 h-4 flex-shrink-0" />
+              <span>Discuss & Order on WhatsApp</span>
             </button>
           </div>
 
@@ -404,7 +404,7 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Trust Guarantees */}
-          <div className="pt-4 border-t border-gold-200 grid grid-cols-2 gap-4 text-xs text-espresso/70 font-light">
+          <div className="pt-4 border-t border-gold-200 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs text-espresso/70 font-light">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-gold-600" />
               <span>Anti-Tarnish & Hypoallergenic</span>

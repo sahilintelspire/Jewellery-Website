@@ -20,6 +20,7 @@ import {
   MessageCircle,
   Package,
   Lock,
+  ChevronDown,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -54,8 +55,9 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState('razorpay'); // 'razorpay' | 'cod'
   const [isRazorpayOpen, setIsRazorpayOpen] = useState(false);
 
-  // Step 4: Confirmed Order
+  // Step 4: Confirmed Order & Mobile Summary Toggle
   const [confirmedOrder, setConfirmedOrder] = useState(null);
+  const [mobileSummaryOpen, setMobileSummaryOpen] = useState(false);
 
   // Sync selected address cleanly only when address book changes (never close form when clicking addresses)
   useEffect(() => {
@@ -184,12 +186,12 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto">
+    <div className="min-h-screen py-6 sm:py-10 px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto">
       
       {/* Top Breadcrumb & Stepper */}
       {step !== 4 && (
-        <div className="mb-10 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="mb-6 sm:mb-10 space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
             <div>
               <span className="text-[11px] uppercase tracking-[0.22em] text-gold-700 font-bold flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5" />
@@ -200,19 +202,19 @@ export default function CheckoutPage() {
               </h1>
             </div>
 
-            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-gold-200 shadow-sm text-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="self-start sm:self-auto flex items-center gap-2 bg-white px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-gold-200 shadow-sm text-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
               <span className="text-espresso/70">Signed in as</span>
-              <span className="font-bold text-espresso">{user?.name}</span>
+              <span className="font-bold text-espresso truncate max-w-[140px]">{user?.name}</span>
             </div>
           </div>
 
           {/* 3-Step Horizontal Bar */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 p-2 rounded-2xl bg-white/80 border border-gold-200 shadow-sm">
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-4 p-1.5 sm:p-2 rounded-2xl bg-white/85 border border-gold-200 shadow-sm">
             {[
-              { num: 1, title: 'Delivery Address' },
-              { num: 2, title: 'Gift & Shipping' },
-              { num: 3, title: 'Payment & Review' },
+              { num: 1, title: 'Delivery Address', short: 'Address' },
+              { num: 2, title: 'Gift & Shipping', short: 'Gift Box' },
+              { num: 3, title: 'Payment & Review', short: 'Payment' },
             ].map((s) => {
               const active = step === s.num;
               const completed = step > s.num;
@@ -225,7 +227,7 @@ export default function CheckoutPage() {
                       setStep(s.num);
                     }
                   }}
-                  className={`py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition ${
+                  className={`py-2.5 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition ${
                     active
                       ? 'btn-gold-mockup text-white'
                       : completed
@@ -234,7 +236,7 @@ export default function CheckoutPage() {
                   }`}
                 >
                   <span
-                    className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold ${
+                    className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold flex-shrink-0 ${
                       active
                         ? 'bg-white text-gold-800'
                         : completed
@@ -244,10 +246,48 @@ export default function CheckoutPage() {
                   >
                     {completed ? '✓' : s.num}
                   </span>
+                  <span className="sm:hidden truncate">{s.short}</span>
                   <span className="hidden sm:inline">{s.title}</span>
                 </button>
               );
             })}
+          </div>
+
+          {/* Mobile Quick Order Summary Accordion */}
+          <div className="lg:hidden rounded-2xl bg-white border border-gold-300/70 shadow-sm overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setMobileSummaryOpen(!mobileSummaryOpen)}
+              className="w-full px-4 py-3 flex items-center justify-between text-xs font-bold text-espresso bg-ivory-50"
+            >
+              <span className="flex items-center gap-2">
+                <ShoppingBag className="w-4 h-4 text-gold-600" />
+                <span>{mobileSummaryOpen ? 'Hide Order Summary' : `View Order Summary (${cart.length} item${cart.length > 1 ? 's' : ''})`}</span>
+                <ChevronDown className={`w-4 h-4 text-gold-600 transition-transform ${mobileSummaryOpen ? 'rotate-180' : ''}`} />
+              </span>
+              <span className="text-base font-bold text-gold-800">₹{grandTotal.toLocaleString('en-IN')}</span>
+            </button>
+
+            {mobileSummaryOpen && (
+              <div className="p-4 border-t border-gold-200 space-y-2.5 text-xs">
+                {cart.map((item, i) => (
+                  <div key={`mob-${item.id}-${i}`} className="flex items-center justify-between gap-2">
+                    <span className="truncate text-espresso/80">
+                      {item.quantity}x {item.shortName || item.name}
+                    </span>
+                    <span className="font-bold text-espresso flex-shrink-0">
+                      ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                ))}
+                {discount > 0 && (
+                  <div className="flex justify-between text-emerald-700 font-bold">
+                    <span>Promo ({appliedCoupon?.code})</span>
+                    <span>- ₹{discount.toLocaleString('en-IN')}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -516,15 +556,15 @@ export default function CheckoutPage() {
 
                   {/* Continue Button */}
                   {activeAddress && !showAddressForm && (
-                    <div className="pt-2 flex items-center justify-between gap-4 border-t border-gold-100">
+                    <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-gold-100">
                       <div className="text-xs text-emerald-700 font-medium flex items-center gap-1.5">
-                        <Truck className="w-4 h-4" />
+                        <Truck className="w-4 h-4 flex-shrink-0" />
                         <span>Express courier serviceable to {activeAddress.pincode}</span>
                       </div>
                       <button
                         type="button"
                         onClick={() => setStep(2)}
-                        className="px-7 py-3.5 rounded-full glass-gold-btn text-xs uppercase tracking-widest font-bold flex items-center gap-2 shadow-md"
+                        className="w-full sm:w-auto px-7 py-3.5 rounded-full glass-gold-btn text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 shadow-md"
                       >
                         <span>Continue to Packaging</span>
                         <ArrowRight className="w-4 h-4" />
@@ -563,9 +603,9 @@ export default function CheckoutPage() {
                   </div>
 
                   {/* Velvet Box Status */}
-                  <div className="p-4 rounded-2xl bg-gradient-to-r from-rosequartz-50 to-gold-50 border border-gold-300/70 flex items-center justify-between gap-4">
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-rosequartz-50 to-gold-50 border border-gold-300/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-white border border-gold-300 flex items-center justify-center text-gold-600 shadow-sm">
+                      <div className="w-10 h-10 rounded-full bg-white border border-gold-300 flex items-center justify-center text-gold-600 shadow-sm flex-shrink-0">
                         <Gift className="w-5 h-5" />
                       </div>
                       <div>
@@ -583,14 +623,14 @@ export default function CheckoutPage() {
                     </div>
 
                     {isFreeGiftUnlocked ? (
-                      <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">
+                      <span className="self-start sm:self-auto px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">
                         FREE
                       </span>
                     ) : (
                       <button
                         type="button"
                         onClick={() => setUpgradeVelvetBox(!upgradeVelvetBox)}
-                        className={`px-4 py-2 rounded-full text-xs font-bold transition ${
+                        className={`self-start sm:self-auto px-4 py-2 rounded-full text-xs font-bold transition ${
                           upgradeVelvetBox
                             ? 'bg-emerald-600 text-white'
                             : 'bg-white border border-gold-400 text-gold-800 hover:bg-gold-50'
@@ -606,7 +646,7 @@ export default function CheckoutPage() {
                     <label className="text-xs uppercase tracking-wider font-bold text-espresso/80 block">
                       Select Satin Gift Ribbon:
                     </label>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
                       {[
                         { name: 'Champagne Gold', dot: 'bg-[#D4AF37]' },
                         { name: 'Blush Rose', dot: 'bg-[#DF9F95]' },
@@ -695,7 +735,7 @@ export default function CheckoutPage() {
                     <button
                       type="button"
                       onClick={() => setStep(3)}
-                      className="px-8 py-3.5 rounded-full glass-gold-btn text-xs uppercase tracking-widest font-bold flex items-center gap-2 shadow-md"
+                      className="w-full sm:w-auto px-8 py-3.5 rounded-full glass-gold-btn text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 shadow-md"
                     >
                       <span>Proceed to Payment</span>
                       <ArrowRight className="w-4 h-4" />
@@ -761,25 +801,25 @@ export default function CheckoutPage() {
                     <button
                       type="button"
                       onClick={() => setPaymentMethod('razorpay')}
-                      className={`w-full p-5 rounded-2xl border-2 text-left transition flex items-start gap-4 ${
+                      className={`w-full p-4 sm:p-5 rounded-2xl border-2 text-left transition flex items-start gap-3 sm:gap-4 ${
                         paymentMethod === 'razorpay'
                           ? 'border-gold-500 bg-gold-50/70 shadow-sm'
                           : 'border-gold-200 bg-white hover:border-gold-300'
                       }`}
                     >
-                      <div className="p-2.5 rounded-xl bg-white border border-gold-200 text-gold-700">
+                      <div className="p-2 sm:p-2.5 rounded-xl bg-white border border-gold-200 text-gold-700 flex-shrink-0">
                         <CreditCard className="w-5 h-5" />
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-sm text-espresso">
-                            Pay Online (Razorpay / UPI / GPay / Cards)
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center justify-between gap-1.5">
+                          <span className="font-bold text-xs sm:text-sm text-espresso">
+                            Pay Online (Razorpay / UPI / Cards)
                           </span>
                           <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                             Recommended
                           </span>
                         </div>
-                        <p className="text-xs text-espresso/60 mt-1">
+                        <p className="text-[11px] sm:text-xs text-espresso/60 mt-1">
                           Instant UPI, PhonePe, Google Pay, Cards & Netbanking with buyer protection.
                         </p>
                       </div>
@@ -788,20 +828,20 @@ export default function CheckoutPage() {
                     <button
                       type="button"
                       onClick={() => setPaymentMethod('cod')}
-                      className={`w-full p-5 rounded-2xl border-2 text-left transition flex items-start gap-4 ${
+                      className={`w-full p-4 sm:p-5 rounded-2xl border-2 text-left transition flex items-start gap-3 sm:gap-4 ${
                         paymentMethod === 'cod'
                           ? 'border-gold-500 bg-gold-50/70 shadow-sm'
                           : 'border-gold-200 bg-white hover:border-gold-300'
                       }`}
                     >
-                      <div className="p-2.5 rounded-xl bg-white border border-gold-200 text-emerald-700">
+                      <div className="p-2 sm:p-2.5 rounded-xl bg-white border border-gold-200 text-emerald-700 flex-shrink-0">
                         <Truck className="w-5 h-5" />
                       </div>
-                      <div className="flex-1">
-                        <span className="font-bold text-sm text-espresso block">
+                      <div className="flex-1 min-w-0">
+                        <span className="font-bold text-xs sm:text-sm text-espresso block">
                           Cash on Delivery (COD)
                         </span>
-                        <p className="text-xs text-espresso/60 mt-1">
+                        <p className="text-[11px] sm:text-xs text-espresso/60 mt-1">
                           Pay via Cash or UPI scanner at your doorstep when parcel arrives.
                         </p>
                       </div>
@@ -812,9 +852,9 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     onClick={handlePlaceOrderClick}
-                    className="w-full py-4 rounded-full glass-gold-btn text-xs uppercase tracking-[0.2em] font-bold shadow-luxury flex items-center justify-center gap-2"
+                    className="w-full py-4 px-5 sm:px-6 rounded-full glass-gold-btn text-[11px] sm:text-xs uppercase tracking-[0.14em] sm:tracking-[0.2em] font-bold shadow-luxury flex items-center justify-center gap-2 text-center"
                   >
-                    <ShieldCheck className="w-4 h-4" />
+                    <ShieldCheck className="w-4 h-4 flex-shrink-0" />
                     <span>
                       {paymentMethod === 'razorpay'
                         ? `Pay ₹${grandTotal.toLocaleString('en-IN')} Securely`

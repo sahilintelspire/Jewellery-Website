@@ -25,16 +25,16 @@ export default function CustomOrderPage() {
   };
 
   return (
-    <div className="min-h-screen py-16 px-6 lg:px-16 max-w-4xl mx-auto">
+    <div className="min-h-screen py-10 sm:py-16 px-4 sm:px-6 lg:px-16 max-w-4xl mx-auto">
       
       {/* Header */}
-      <div className="text-center space-y-4 mb-12">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold-100 text-gold-800 text-xs uppercase tracking-widest font-semibold">
+      <div className="text-center space-y-3 sm:space-y-4 mb-8 sm:mb-12">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold-100 text-gold-800 text-[11px] sm:text-xs uppercase tracking-widest font-semibold">
           <Sparkles className="w-3.5 h-3.5 text-gold-600 animate-spin" />
           <span>Bespoke Atelier Commission</span>
         </div>
 
-        <h1 className="font-serif-lux text-4xl sm:text-6xl font-bold text-espresso">
+        <h1 className="font-serif-lux text-3xl sm:text-6xl font-bold text-espresso">
           Design Your Dream Piece
         </h1>
 
@@ -44,7 +44,7 @@ export default function CustomOrderPage() {
       </div>
 
       {/* Form Card */}
-      <div className="p-8 sm:p-12 rounded-3xl bg-white border border-gold-300 shadow-luxury">
+      <div className="p-5 sm:p-12 rounded-3xl bg-white border border-gold-300 shadow-luxury">
         <form onSubmit={handleSubmit} className="space-y-6">
           
           {/* 1. Name */}
@@ -113,7 +113,7 @@ export default function CustomOrderPage() {
             <label className="block text-xs uppercase tracking-wider font-bold text-espresso/80 mb-2">
               Approximate Budget:
             </label>
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               {['Under ₹999', '₹1,000 - ₹2,000', '₹2,000+ Luxury'].map((b) => (
                 <button
                   type="button"
@@ -148,10 +148,10 @@ export default function CustomOrderPage() {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full py-4 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs uppercase tracking-widest font-bold shadow-md flex items-center justify-center gap-2 transition"
+            className="w-full py-4 px-5 sm:px-6 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-widest font-bold shadow-md flex items-center justify-center gap-2 text-center transition"
           >
-            <MessageCircle className="w-4 h-4" />
-            <span>Send Custom Request Directly on WhatsApp</span>
+            <MessageCircle className="w-4 h-4 flex-shrink-0" />
+            <span>Send Custom Request on WhatsApp</span>
           </button>
 
           <p className="text-[11px] text-espresso/50 text-center">

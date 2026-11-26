@@ -37,7 +37,7 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="min-h-screen py-16 px-6 lg:px-16 max-w-6xl mx-auto space-y-16">
+    <div className="min-h-screen py-10 sm:py-16 px-4 sm:px-6 lg:px-16 max-w-6xl mx-auto space-y-12 sm:space-y-16">
       
       {/* Header */}
       <div className="text-center space-y-4 max-w-2xl mx-auto">
@@ -88,16 +88,16 @@ export default function ContactPage() {
               href="https://wa.me/918780125711"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs uppercase tracking-wider font-bold shadow-sm flex items-center justify-center gap-2 transition"
+              className="w-full py-3 px-5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs uppercase tracking-wider font-bold shadow-sm flex items-center justify-center gap-2 transition"
             >
-              <MessageCircle className="w-4 h-4" />
+              <MessageCircle className="w-4 h-4 flex-shrink-0" />
               <span>Direct WhatsApp Chat</span>
             </a>
           </div>
         </div>
 
         {/* Right: Contact Form */}
-        <div className="md:col-span-7 p-8 sm:p-10 rounded-3xl bg-white border border-gold-300 shadow-sm">
+        <div className="md:col-span-7 p-6 sm:p-10 rounded-3xl bg-white border border-gold-300 shadow-sm">
           <h3 className="font-serif-lux text-2xl font-bold text-espresso mb-6">
             Send A Message
           </h3>
@@ -147,9 +147,9 @@ export default function ContactPage() {
 
             <button
               type="submit"
-              className="w-full py-3.5 rounded-full glass-gold-btn text-xs uppercase tracking-widest font-bold shadow-md flex items-center justify-center gap-2"
+              className="w-full py-3.5 px-5 rounded-full glass-gold-btn text-xs uppercase tracking-widest font-bold shadow-md flex items-center justify-center gap-2"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4 flex-shrink-0" />
               <span>Submit Inquiry</span>
             </button>
           </form>

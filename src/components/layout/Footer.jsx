@@ -4,8 +4,8 @@ import { Heart, ShieldCheck, Truck, RefreshCw, MessageCircle, Instagram } from '
 
 export default function Footer() {
   return (
-    <footer className="bg-ivory-200/60 border-t border-gold-300/40 pt-16 pb-10 px-6 lg:px-16 text-espresso">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+    <footer className="bg-ivory-200/60 border-t border-gold-300/40 pt-12 sm:pt-16 pb-20 sm:pb-10 px-4 sm:px-6 lg:px-16 text-espresso">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-10 sm:mb-12">
         
         {/* Col 1: Brand Info */}
         <div className="space-y-4">

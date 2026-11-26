@@ -111,17 +111,17 @@ export default function CartDrawer() {
           />
 
           {/* Slide-in Drawer Panel */}
-          <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
+          <div className="absolute inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', stiffness: 340, damping: 34 }}
-              className="w-screen max-w-md bg-ivory-50 border-l border-gold-300/40 shadow-2xl flex flex-col justify-between"
+              className="w-screen sm:max-w-md bg-ivory-50 sm:border-l border-gold-300/40 shadow-2xl flex flex-col justify-between"
             >
               
               {/* Header */}
-              <div className="p-6 border-b border-gold-200/60 bg-white/80 backdrop-blur-md">
+              <div className="p-4 sm:p-6 border-b border-gold-200/60 bg-white/85 backdrop-blur-md">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <ShoppingBag className="w-5 h-5 text-gold-600" />
@@ -264,7 +264,7 @@ export default function CartDrawer() {
 
               {/* Footer Checkout Buttons */}
               {cart.length > 0 && (
-                <div className="p-6 border-t border-gold-200/80 bg-white/90 backdrop-blur-md space-y-4">
+                <div className="p-4 sm:p-6 border-t border-gold-200/80 bg-white/95 backdrop-blur-md space-y-3.5 sm:space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-xs uppercase tracking-wider text-espresso/60 font-semibold">
                       Subtotal
@@ -275,9 +275,9 @@ export default function CartDrawer() {
                   </div>
 
                   {/* Login & Address Reminder Pill */}
-                  <div className="px-3 py-2 rounded-xl bg-ivory-100 border border-gold-200 text-[11px] text-espresso/75 flex items-center gap-2">
+                  <div className="px-3.5 py-2 rounded-xl bg-ivory-100 border border-gold-200 text-[11px] text-espresso/75 flex items-center gap-2">
                     <MapPin className="w-3.5 h-3.5 text-gold-600 flex-shrink-0" />
-                    <span>
+                    <span className="truncate">
                       {!isAuthenticated
                         ? 'Sign in at next step to save your delivery address.'
                         : defaultAddress
@@ -286,28 +286,28 @@ export default function CartDrawer() {
                     </span>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {/* Primary Checkout Button */}
                     <button
                       onClick={handleProtectedCheckout}
-                      className="w-full py-4 rounded-full glass-gold-btn text-xs uppercase tracking-[0.18em] font-bold shadow-luxury flex items-center justify-center gap-2"
+                      className="w-full py-3.5 sm:py-4 px-5 sm:px-6 rounded-full glass-gold-btn text-[11px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.16em] font-bold shadow-luxury flex items-center justify-center gap-2.5 text-center"
                     >
-                      <Lock className="w-4 h-4" />
+                      <Lock className="w-4 h-4 flex-shrink-0" />
                       <span>
                         {isAuthenticated
-                          ? 'Proceed to Address & Checkout'
+                          ? 'Proceed to Checkout'
                           : 'Sign In to Checkout'}
                       </span>
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-4 h-4 flex-shrink-0" />
                     </button>
 
                     {/* WhatsApp Direct Order Button (Also enforces Login + Address!) */}
                     <button
                       onClick={handleWhatsAppCheckout}
-                      className="w-full py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs uppercase tracking-[0.16em] font-bold shadow-md flex items-center justify-center gap-2 transition"
+                      className="w-full py-3.5 px-5 sm:px-6 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] sm:text-xs uppercase tracking-[0.1em] sm:tracking-[0.14em] font-bold shadow-md flex items-center justify-center gap-2.5 text-center transition"
                     >
-                      <MessageCircle className="w-4 h-4" />
-                      <span>Order via WhatsApp (COD Available)</span>
+                      <MessageCircle className="w-4 h-4 flex-shrink-0" />
+                      <span>Order via WhatsApp (COD)</span>
                     </button>
                   </div>
                 </div>

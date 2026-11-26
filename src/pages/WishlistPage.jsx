@@ -13,7 +13,7 @@ export default function WishlistPage() {
   const wishlistedProducts = PRODUCTS.filter((p) => wishlist.includes(p.id));
 
   return (
-    <div className="min-h-screen py-12 px-6 lg:px-16 max-w-7xl mx-auto">
+    <div className="min-h-screen py-8 sm:py-12 px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-espresso/60 mb-8 uppercase tracking-wider">
         <Link to="/" className="hover:text-gold-700">
@@ -91,7 +91,7 @@ export default function WishlistPage() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {wishlistedProducts.map((product, index) => (
               <ProductCard
                 key={product.id}

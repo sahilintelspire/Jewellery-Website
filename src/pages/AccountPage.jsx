@@ -160,11 +160,11 @@ export default function AccountPage() {
       </motion.div>
 
       {/* ANIMATED TAB BAR */}
-      <div className="inline-flex flex-wrap p-1.5 rounded-2xl bg-white border border-gold-200 shadow-sm gap-1">
+      <div className="w-full sm:w-auto grid grid-cols-3 sm:inline-flex p-1.5 rounded-2xl bg-white border border-gold-200 shadow-sm gap-1">
         {[
-          { id: 'orders', label: `My Orders (${orders.length})`, icon: Package },
-          { id: 'addresses', label: `Saved Addresses (${addresses.length})`, icon: MapPin },
-          { id: 'profile', label: 'Profile & Security', icon: User },
+          { id: 'orders', label: `My Orders (${orders.length})`, short: `Orders (${orders.length})`, icon: Package },
+          { id: 'addresses', label: `Saved Addresses (${addresses.length})`, short: `Address (${addresses.length})`, icon: MapPin },
+          { id: 'profile', label: 'Profile & Security', short: 'Profile', icon: User },
         ].map((tab) => {
           const active = activeTab === tab.id;
           return (
@@ -172,7 +172,7 @@ export default function AccountPage() {
               key={tab.id}
               type="button"
               onClick={() => handleTabChange(tab.id)}
-              className={`relative px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider font-bold flex items-center gap-2 transition z-10 ${
+              className={`relative px-2 sm:px-5 py-2.5 rounded-xl text-[10px] sm:text-xs uppercase tracking-wide sm:tracking-wider font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition z-10 ${
                 active ? 'text-white' : 'text-espresso/70 hover:text-espresso'
               }`}
             >
@@ -183,8 +183,9 @@ export default function AccountPage() {
                   className="absolute inset-0 rounded-xl btn-gold-mockup -z-10"
                 />
               )}
-              <tab.icon className="w-3.5 h-3.5" />
-              <span>{tab.label}</span>
+              <tab.icon className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="sm:hidden truncate">{tab.short}</span>
+              <span className="hidden sm:inline">{tab.label}</span>
             </button>
           );
         })}
@@ -273,16 +274,16 @@ export default function AccountPage() {
                     {/* 5-Stage Tracking Timeline */}
                     {!isCancelled && (
                       <div className="py-2">
-                        <div className="flex items-center justify-between text-[11px] font-bold text-espresso/65 mb-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] font-bold text-espresso/65 mb-3">
                           <span className="flex items-center gap-1.5 text-emerald-700">
-                            <Truck className="w-4 h-4" />
+                            <Truck className="w-4 h-4 flex-shrink-0" />
                             <span>Est. Delivery: {order.estimatedDelivery}</span>
                           </span>
                           {currentStep < 4 && (
                             <button
                               type="button"
                               onClick={() => advanceOrderStatus(order.id)}
-                              className="text-[10px] px-3 py-1 rounded-full bg-ivory-100 hover:bg-gold-100 border border-gold-300 text-gold-800 transition"
+                              className="self-start sm:self-auto text-[10px] px-3 py-1 rounded-full bg-ivory-100 hover:bg-gold-100 border border-gold-300 text-gold-800 transition"
                               title="Simulate next crafting/delivery milestone"
                             >
                               ↻ Simulate Next Tracking Stage
@@ -290,7 +291,36 @@ export default function AccountPage() {
                           )}
                         </div>
 
-                        <div className="grid grid-cols-5 gap-1.5 sm:gap-3">
+                        {/* Mobile Vertical Stepper */}
+                        <div className="sm:hidden space-y-2.5 pl-1 pt-1">
+                          {ORDER_STAGES.map((stageLabel, idx) => {
+                            const done = idx <= currentStep;
+                            const isCurrent = idx === currentStep;
+                            return (
+                              <div key={stageLabel} className="flex items-center gap-3">
+                                <span
+                                  className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 text-[9px] font-bold ${
+                                    done
+                                      ? 'bg-emerald-500 text-white'
+                                      : 'bg-ivory-200 text-espresso/40'
+                                  } ${isCurrent ? 'ring-2 ring-gold-400 animate-pulse' : ''}`}
+                                >
+                                  {done ? '✓' : idx + 1}
+                                </span>
+                                <span
+                                  className={`text-xs ${
+                                    done ? 'font-bold text-espresso' : 'text-espresso/45'
+                                  }`}
+                                >
+                                  {stageLabel}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Tablet & Desktop Horizontal Stepper */}
+                        <div className="hidden sm:grid sm:grid-cols-5 gap-3">
                           {ORDER_STAGES.map((stageLabel, idx) => {
                             const done = idx <= currentStep;
                             const isCurrent = idx === currentStep;
@@ -305,10 +335,10 @@ export default function AccountPage() {
                                 />
                                 <div className="flex items-center gap-1">
                                   {done && (
-                                    <CheckCircle2 className="w-3 h-3 text-emerald-600 flex-shrink-0 hidden sm:inline" />
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-600 flex-shrink-0" />
                                   )}
                                   <p
-                                    className={`text-[9px] sm:text-[11px] leading-tight ${
+                                    className={`text-[11px] leading-tight ${
                                       done ? 'font-bold text-espresso' : 'text-espresso/45'
                                     }`}
                                   >

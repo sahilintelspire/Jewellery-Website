@@ -24,8 +24,8 @@ export default function NewsletterSection() {
   };
 
   return (
-    <section className="py-20 px-6 lg:px-16 max-w-7xl mx-auto">
-      <div className="relative rounded-3xl overflow-hidden p-8 sm:p-14 border border-gold-300/80 shadow-luxury bg-gradient-to-br from-white via-ivory-100 to-[#F5E8E4]/70">
+    <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto">
+      <div className="relative rounded-3xl overflow-hidden p-6 sm:p-14 border border-gold-300/80 shadow-luxury bg-gradient-to-br from-white via-ivory-100 to-[#F5E8E4]/70">
         
         {/* Ambient Decorative Blurs */}
         <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-gold-200/30 blur-3xl pointer-events-none" />
@@ -60,8 +60,8 @@ export default function NewsletterSection() {
             </div>
           ) : (
             <form onSubmit={handleSubscribe} className="pt-4 max-w-lg mx-auto">
-              <div className="flex flex-col sm:flex-row items-center gap-2 p-1.5 rounded-full bg-white border border-gold-300 shadow-md">
-                <div className="flex items-center gap-2.5 px-4 py-2 w-full flex-1">
+              <div className="flex flex-col sm:flex-row items-center gap-2 p-2 sm:p-1.5 rounded-2xl sm:rounded-full bg-white border border-gold-300 shadow-md">
+                <div className="flex items-center gap-2.5 px-3 sm:px-4 py-2 w-full flex-1">
                   <Mail className="w-4 h-4 text-gold-600 flex-shrink-0" />
                   <input
                     type="email"
@@ -78,7 +78,7 @@ export default function NewsletterSection() {
 
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-7 py-3 rounded-full btn-gold-mockup text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 whitespace-nowrap shadow-sm"
+                  className="w-full sm:w-auto px-7 py-3 rounded-xl sm:rounded-full btn-gold-mockup text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 whitespace-nowrap shadow-sm"
                 >
                   <span>Subscribe</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -94,14 +94,14 @@ export default function NewsletterSection() {
           )}
 
           {/* Trust Guarantees */}
-          <div className="pt-4 flex flex-wrap items-center justify-center gap-6 text-[11px] text-espresso/60 font-medium">
+          <div className="pt-4 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[11px] text-espresso/60 font-medium">
             <span className="flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-gold-600" />
               <span>Zero spam, ever</span>
             </span>
-            <span>•</span>
+            <span className="hidden sm:inline">•</span>
             <span>Instant notification on new drops</span>
-            <span>•</span>
+            <span className="hidden sm:inline">•</span>
             <span>Unsubscribe anytime</span>
           </div>
 

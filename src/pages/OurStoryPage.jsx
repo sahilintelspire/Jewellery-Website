@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export default function OurStoryPage() {
   return (
-    <div className="min-h-screen py-16 px-6 lg:px-16 max-w-5xl mx-auto space-y-16">
+    <div className="min-h-screen py-10 sm:py-16 px-4 sm:px-6 lg:px-16 max-w-5xl mx-auto space-y-12 sm:space-y-16">
       
       {/* Header */}
       <div className="text-center space-y-4 max-w-2xl mx-auto">

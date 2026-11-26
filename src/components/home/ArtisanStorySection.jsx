@@ -3,7 +3,7 @@ import { Sparkles, Heart } from 'lucide-react';
 
 export default function ArtisanStorySection() {
   return (
-    <section className="py-24 px-6 lg:px-16 bg-white/60 border-y border-gold-200/60 relative overflow-hidden">
+    <section className="py-14 sm:py-24 px-4 sm:px-6 lg:px-16 bg-white/60 border-y border-gold-200/60 relative overflow-hidden">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         
         {/* Left Visual Collage */}
@@ -45,21 +45,21 @@ export default function ArtisanStorySection() {
             When you wear our jewellery, you wear mindful meditation, genuine natural healing crystals, and a story meant exclusively for you.
           </p>
 
-          <div className="grid grid-cols-3 gap-6 pt-6 border-t border-gold-200 text-center">
+          <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-6 border-t border-gold-200 text-center">
             <div>
-              <p className="font-serif-lux text-3xl sm:text-4xl font-bold text-gold-700">100%</p>
+              <p className="font-serif-lux text-2xl sm:text-4xl font-bold text-gold-700">100%</p>
               <p className="text-[10px] sm:text-xs uppercase tracking-wider text-espresso/60 mt-1">
                 Hand Sculpted
               </p>
             </div>
             <div>
-              <p className="font-serif-lux text-3xl sm:text-4xl font-bold text-gold-700">500+</p>
+              <p className="font-serif-lux text-2xl sm:text-4xl font-bold text-gold-700">500+</p>
               <p className="text-[10px] sm:text-xs uppercase tracking-wider text-espresso/60 mt-1">
                 Smiles Delivered
               </p>
             </div>
             <div>
-              <p className="font-serif-lux text-3xl sm:text-4xl font-bold text-gold-700">Zero</p>
+              <p className="font-serif-lux text-2xl sm:text-4xl font-bold text-gold-700">Zero</p>
               <p className="text-[10px] sm:text-xs uppercase tracking-wider text-espresso/60 mt-1">
                 Factory Clones
               </p>

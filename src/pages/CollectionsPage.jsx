@@ -46,7 +46,7 @@ export default function CollectionsPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-6 lg:px-16 max-w-7xl mx-auto">
+    <div className="min-h-screen py-8 sm:py-12 px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto">
       {/* Header Banner */}
       <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
         <span className="text-xs uppercase tracking-[0.25em] text-gold-600 font-semibold flex items-center justify-center gap-1.5">
@@ -129,7 +129,7 @@ export default function CollectionsPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {filtered.map((product, index) => (
             <ProductCard key={product.id} product={product} index={index} />
           ))}

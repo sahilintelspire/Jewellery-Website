@@ -224,7 +224,7 @@ export default function AuthPage() {
   );
 
   return (
-    <div className="min-h-[calc(100vh-110px)] relative overflow-hidden silk-mesh-bg py-8 sm:py-12 px-4 sm:px-6 lg:px-16 flex items-center justify-center">
+    <div className="min-h-[calc(100vh-110px)] relative overflow-hidden silk-mesh-bg py-5 sm:py-12 px-3 sm:px-6 lg:px-16 flex items-center justify-center">
       {/* Lightweight Soft Luxury Background Glows (Zero heavy GPU blur recomposition) */}
       <div
         className="absolute -top-24 -left-24 w-[28rem] h-[28rem] rounded-full pointer-events-none"
@@ -239,25 +239,25 @@ export default function AuthPage() {
         }}
       />
 
-      <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center relative z-10">
+      <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-10 items-center relative z-10">
         
         {/* LEFT COLUMN: 3D CRYSTAL SHOWCASE + MOTION STORYTELLING */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="lg:col-span-6 relative rounded-[2rem] p-6 sm:p-8 bg-white/90 border border-gold-300/40 shadow-luxury overflow-hidden flex flex-col justify-between"
+          className="lg:col-span-6 relative rounded-[1.75rem] sm:rounded-[2rem] p-4 sm:p-8 bg-white/90 border border-gold-300/40 shadow-luxury overflow-hidden flex flex-col justify-between"
         >
           {/* Top Brand Tag */}
-          <div className="flex items-center justify-between z-20">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 border border-gold-300/60 shadow-sm text-[11px] uppercase tracking-[0.2em] font-bold text-gold-800">
+          <div className="flex items-center justify-between gap-2 z-20">
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:py-1.5 rounded-full bg-white/90 border border-gold-300/60 shadow-sm text-[10px] sm:text-[11px] uppercase tracking-[0.12em] sm:tracking-[0.2em] font-bold text-gold-800">
               <Sparkles className="w-3.5 h-3.5 text-gold-500 animate-pulse" />
               <span>Private Atelier Vault</span>
             </div>
 
             <Link
               to="/"
-              className="text-xs font-semibold text-espresso/60 hover:text-gold-700 flex items-center gap-1 transition"
+              className="text-[11px] sm:text-xs font-semibold text-espresso/60 hover:text-gold-700 flex items-center gap-1 transition flex-shrink-0"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Boutique</span>
@@ -265,7 +265,7 @@ export default function AuthPage() {
           </div>
 
           {/* 3D Interactive Crystal Heart & Orbital Gold Rings Canvas */}
-          <div className="my-2 relative">
+          <div className="my-1 sm:my-2 relative">
             <Auth3DCanvas
               mode={mode}
               focusedField={focusedField}
@@ -274,7 +274,7 @@ export default function AuthPage() {
           </div>
 
           {/* Floating Motion Editorial Footer & Feature Chips */}
-          <div className="space-y-4 z-20">
+          <div className="space-y-3 sm:space-y-4 z-20">
             <AnimatePresence mode="wait">
               <motion.div
                 key={mode}
@@ -284,12 +284,12 @@ export default function AuthPage() {
                 transition={{ duration: 0.3 }}
                 className="text-center space-y-1"
               >
-                <h2 className="font-serif-lux text-2xl sm:text-3xl font-bold text-espresso">
+                <h2 className="font-serif-lux text-xl sm:text-3xl font-bold text-espresso">
                   {mode === 'login' && 'Welcome Back To Timeless Elegance'}
                   {mode === 'register' && 'Craft Your Bespoke Atelier Profile'}
                   {mode === 'forgot' && 'Restore Access To Your Vault'}
                 </h2>
-                <p className="text-xs text-espresso/65 font-light max-w-md mx-auto">
+                <p className="text-[11px] sm:text-xs text-espresso/65 font-light max-w-md mx-auto">
                   {mode === 'login' &&
                     'Access saved delivery addresses, track handcrafted orders live, and enjoy 1-click checkout.'}
                   {mode === 'register' &&
@@ -300,7 +300,7 @@ export default function AuthPage() {
               </motion.div>
             </AnimatePresence>
 
-            <div className="grid grid-cols-3 gap-2.5 pt-2">
+            <div className="hidden sm:grid grid-cols-3 gap-2.5 pt-2">
               {[
                 { icon: ShieldCheck, label: 'Verified Buyer Protection' },
                 { icon: Gift, label: 'Free Velvet Gift Box' },
@@ -328,7 +328,7 @@ export default function AuthPage() {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
           className="lg:col-span-6 max-w-xl w-full mx-auto"
         >
-          <div className="bg-white/95 rounded-[2rem] p-6 sm:p-10 border border-gold-300/70 shadow-luxury relative overflow-hidden">
+          <div className="bg-white/95 rounded-[1.75rem] sm:rounded-[2rem] p-5 sm:p-10 border border-gold-300/70 shadow-luxury relative overflow-hidden">
             
             {/* Redirect Notice Banner if triggered from Buy / Checkout */}
             {redirectReason && (
@@ -360,7 +360,7 @@ export default function AuthPage() {
                       key={tab.id}
                       type="button"
                       onClick={() => switchMode(tab.id)}
-                      className={`relative py-2.5 rounded-full text-xs uppercase tracking-[0.18em] font-bold transition-colors z-10 ${
+                      className={`relative py-2.5 rounded-full text-[11px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.18em] font-bold transition-colors z-10 ${
                         active ? 'text-white' : 'text-espresso/70 hover:text-espresso'
                       }`}
                     >
@@ -503,10 +503,10 @@ export default function AuthPage() {
                     whileTap={{ scale: 0.98 }}
                     type="submit"
                     disabled={authSuccess}
-                    className="w-full py-4 mt-2 rounded-full glass-gold-btn text-xs uppercase tracking-[0.2em] font-bold shadow-luxury flex items-center justify-center gap-2"
+                    className="w-full py-4 px-5 mt-2 rounded-full glass-gold-btn text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] font-bold shadow-luxury flex items-center justify-center gap-2"
                   >
                     <span>{authSuccess ? 'Entering Atelier...' : 'Sign In & Continue'}</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4 flex-shrink-0" />
                   </motion.button>
 
                   {renderGoogleDividerAndButton('Continue with Google')}
@@ -706,10 +706,10 @@ export default function AuthPage() {
                     whileTap={{ scale: 0.98 }}
                     type="submit"
                     disabled={authSuccess}
-                    className="w-full py-4 mt-2 rounded-full glass-gold-btn text-xs uppercase tracking-[0.2em] font-bold shadow-luxury flex items-center justify-center gap-2"
+                    className="w-full py-4 px-5 mt-2 rounded-full glass-gold-btn text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] font-bold shadow-luxury flex items-center justify-center gap-2"
                   >
                     <span>{authSuccess ? 'Creating Vault Profile...' : 'Create Account & Join'}</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4 flex-shrink-0" />
                   </motion.button>
 
                   {renderGoogleDividerAndButton('Sign up with Google')}

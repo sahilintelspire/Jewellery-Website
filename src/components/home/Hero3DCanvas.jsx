@@ -557,7 +557,7 @@ export default function Hero3DCanvas({
       if (!w || !h) return;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
-      camera.position.z = w / h < 0.8 ? 9.6 : 7.2;
+      camera.position.z = w / h < 0.85 ? 9.0 : w < 640 ? 7.0 : 7.2;
       camera.updateProjectionMatrix();
     };
     const ro = new ResizeObserver(resize);
@@ -759,28 +759,24 @@ export default function Hero3DCanvas({
   };
 
   return (
-    <div className="relative w-full aspect-[1.3/1] max-w-[720px] mx-auto flex items-center justify-center select-none">
+    <div className="relative w-full max-w-[720px] h-[310px] sm:h-[430px] lg:h-[520px] mx-auto flex items-center justify-center select-none">
       {/* 1. Luxury Atelier Radial Aura (Warm Rose & Champagne halo for 100% contrast against light website background) */}
       <div 
         className="absolute inset-0 pointer-events-none transform scale-95"
         style={{
           background: "radial-gradient(circle at 50% 48%, rgba(245, 206, 215, 0.72) 0%, rgba(240, 195, 205, 0.48) 35%, rgba(235, 212, 195, 0.25) 58%, transparent 74%)",
-          filter: "blur(40px)"
         }}
       />
 
       {/* 2. Soft Ground Contact Shadow (Under the floating bracelet for real 3D depth) */}
-      <div className="absolute bottom-8 w-64 sm:w-80 h-7 rounded-[100%] bg-[#735149]/16 blur-xl pointer-events-none transform scale-y-75" />
-      <div className="absolute bottom-10 w-44 sm:w-56 h-4 rounded-[100%] bg-[#5c3e38]/18 blur-md pointer-events-none" />
+      <div className="absolute bottom-8 w-52 sm:w-80 h-6 sm:h-7 rounded-[100%] bg-[#735149]/16 blur-xl pointer-events-none transform scale-y-75" />
+      <div className="absolute bottom-10 w-36 sm:w-56 h-3.5 sm:h-4 rounded-[100%] bg-[#5c3e38]/18 blur-md pointer-events-none" />
 
       {/* 3. The 3D WebGL Canvas Container (100% transparent background) */}
       <div
         ref={mountRef}
-        className={className}
+        className={`w-full h-full relative ${className}`}
         style={{
-          width: "100%",
-          height: height || "520px",
-          position: "relative",
           background: "transparent",
           ...style,
         }}
@@ -789,8 +785,8 @@ export default function Hero3DCanvas({
       />
 
       {/* 4. 360° Drag Hint Pill (Dynamically updates per step!) */}
-      <div className="absolute bottom-2 z-20 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-gold-400/50 text-[10px] uppercase tracking-[0.2em] font-bold text-espresso shadow-md pointer-events-none transition-all duration-300">
-        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+      <div className="absolute bottom-2 z-20 max-w-[94%] text-center inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-white/95 border border-gold-400/50 text-[9px] sm:text-[10px] uppercase tracking-[0.09em] sm:tracking-[0.2em] font-bold text-espresso shadow-md pointer-events-none transition-all duration-300 leading-tight">
+        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping flex-shrink-0" />
         <span>{getHintText()}</span>
       </div>
     </div>
