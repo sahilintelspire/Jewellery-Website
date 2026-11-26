@@ -23,7 +23,7 @@ import GoogleAuthModal from '../components/auth/GoogleAuthModal';
 import { useAuth } from '../context/AuthContext';
 
 export default function AuthPage() {
-  const { login, register, loginWithGoogle, resetPassword, isAuthenticated } = useAuth();
+  const { login, register, loginWithGoogle, requestPasswordReset, resetPassword, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -45,6 +45,9 @@ export default function AuthPage() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [resetOtp, setResetOtp] = useState('');
+  const [forgotStep, setForgotStep] = useState('request'); // 'request' | 'verify'
+  const [devOtpHint, setDevOtpHint] = useState('');
 
   // If already logged in and visiting /auth directly, redirect cleanly
   useEffect(() => {
@@ -90,14 +93,14 @@ export default function AuthPage() {
 
   const pwdStrength = getPasswordStrength(password);
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
     if (!email.trim() || !password) {
       return triggerError('Please enter both your email and password.');
     }
 
-    const res = login({ email, password });
+    const res = await login({ email, password });
     if (!res.ok) {
       return triggerError(res.error);
     }
@@ -105,11 +108,11 @@ export default function AuthPage() {
     setAuthSuccess(true);
     fireLuxuryConfetti();
     setTimeout(() => {
-      navigate(redirectTo, { replace: true });
+      navigate(res.user?.role === 'admin' && !location.state?.from ? '/admin' : redirectTo, { replace: true });
     }, 950);
   };
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
@@ -129,7 +132,7 @@ export default function AuthPage() {
       return triggerError('Passwords do not match.');
     }
 
-    const res = register({ name, email, phone, password });
+    const res = await register({ name, email, phone, password });
     if (!res.ok) {
       return triggerError(res.error);
     }
@@ -141,7 +144,7 @@ export default function AuthPage() {
     }, 1050);
   };
 
-  const handleForgotSubmit = (e) => {
+  const handleForgotSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
@@ -149,11 +152,26 @@ export default function AuthPage() {
     if (!email.trim()) {
       return triggerError('Please enter your registered email.');
     }
+
+    if (forgotStep === 'request') {
+      const res = await requestPasswordReset(email);
+      if (!res.ok) {
+        return triggerError(res.error);
+      }
+      setForgotStep('verify');
+      setDevOtpHint(res.devOtp || '');
+      setSuccessMsg('Verification code sent! Check your email and enter the 6-digit code below.');
+      return;
+    }
+
+    if (!resetOtp.trim()) {
+      return triggerError('Please enter the 6-digit verification code.');
+    }
     if (password.length < 6) {
       return triggerError('New password must be at least 6 characters.');
     }
 
-    const res = resetPassword({ email, newPassword: password });
+    const res = await resetPassword({ email, otp: resetOtp, newPassword: password });
     if (!res.ok) {
       return triggerError(res.error);
     }
@@ -161,19 +179,16 @@ export default function AuthPage() {
     setSuccessMsg('Password reset successful! Switching to Sign In...');
     setTimeout(() => {
       setPassword('');
+      setResetOtp('');
+      setForgotStep('request');
+      setDevOtpHint('');
       switchMode('login');
     }, 1300);
   };
 
-  const fillDemoCustomer = () => {
-    setEmail('ananya@aurajewels.in');
-    setPassword('Aura@2026');
-    setErrorMsg('');
-  };
-
-  const handleGoogleSelect = (googleAcc) => {
+  const handleGoogleSelect = async (googleAcc) => {
     setGoogleOpen(false);
-    const res = loginWithGoogle(googleAcc);
+    const res = await loginWithGoogle(googleAcc);
     if (!res.ok) {
       return triggerError(res.error);
     }
@@ -513,13 +528,13 @@ export default function AuthPage() {
 
                   {/* Demo Quick Fill Helper */}
                   <div className="pt-4 border-t border-gold-200/60 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px]">
-                    <span className="text-espresso/60">Want to preview right away?</span>
+                    <span className="text-espresso/60">First time visiting our Atelier?</span>
                     <button
                       type="button"
-                      onClick={fillDemoCustomer}
+                      onClick={() => switchMode('register')}
                       className="px-3.5 py-1.5 rounded-full bg-gold-50 hover:bg-gold-100 border border-gold-300 text-gold-800 font-bold transition"
                     >
-                      ✦ Auto-Fill Demo Account
+                      ✦ Create Free Account
                     </button>
                   </div>
                 </motion.form>
@@ -764,30 +779,52 @@ export default function AuthPage() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-[11px] uppercase tracking-wider font-bold text-espresso/75 mb-1.5">
-                      New Password
-                    </label>
-                    <div className="flex items-center gap-2.5 px-4 py-3 rounded-2xl border border-gold-200 bg-ivory-50 focus-within:border-gold-500 focus-within:bg-white">
-                      <Lock className="w-4 h-4 text-gold-600 flex-shrink-0" />
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        value={password}
-                        onFocus={() => setFocusedField('password')}
-                        onBlur={() => setFocusedField('none')}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Min. 6 characters"
-                        className="w-full text-xs text-espresso bg-transparent focus:outline-none"
-                      />
-                    </div>
-                  </div>
+                  {forgotStep === 'verify' && (
+                    <>
+                      {devOtpHint && (
+                        <div className="rounded-xl bg-amber-50 border border-amber-200 px-3.5 py-2 text-[11px] text-amber-800">
+                          Local preview OTP: <strong className="font-mono tracking-wider">{devOtpHint}</strong>
+                        </div>
+                      )}
+                      <div>
+                        <label className="block text-[11px] uppercase tracking-wider font-bold text-espresso/75 mb-1.5">
+                          6-Digit Reset Code
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={resetOtp}
+                          onChange={(e) => setResetOtp(e.target.value)}
+                          placeholder="Enter code from email"
+                          className="w-full px-4 py-3 rounded-2xl border border-gold-200 bg-ivory-50 text-xs text-espresso focus:outline-none focus:border-gold-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] uppercase tracking-wider font-bold text-espresso/75 mb-1.5">
+                          New Password
+                        </label>
+                        <div className="flex items-center gap-2.5 px-4 py-3 rounded-2xl border border-gold-200 bg-ivory-50 focus-within:border-gold-500 focus-within:bg-white">
+                          <Lock className="w-4 h-4 text-gold-600 flex-shrink-0" />
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            required
+                            value={password}
+                            onFocus={() => setFocusedField('password')}
+                            onBlur={() => setFocusedField('none')}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Min. 6 characters"
+                            className="w-full text-xs text-espresso bg-transparent focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
 
                   <button
                     type="submit"
                     className="w-full py-4 rounded-full glass-gold-btn text-xs uppercase tracking-[0.2em] font-bold shadow-luxury"
                   >
-                    Update Password
+                    {forgotStep === 'request' ? 'Send Verification Code' : 'Update Password'}
                   </button>
                 </motion.form>
               )}

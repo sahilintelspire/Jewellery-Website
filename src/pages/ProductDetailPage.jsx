@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Star,
   Heart,
@@ -12,11 +12,14 @@ import {
   Sparkles,
   Zap,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Send,
 } from 'lucide-react';
-import { PRODUCTS } from '../data/products';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useStore } from '../context/StoreContext';
+import { storefrontApi } from '../services/api';
 import ProductCard from '../components/common/ProductCard';
 
 const INITIAL_REVIEWS = [
@@ -43,41 +46,102 @@ const INITIAL_REVIEWS = [
 export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const product = PRODUCTS.find((p) => p.id === id) || PRODUCTS[0];
+  const { products, settings } = useStore();
+  const [liveProduct, setLiveProduct] = useState(null);
+  const product = liveProduct || products.find((p) => p.id === id || p.slug === id) || products[0];
 
   const { addToCart, toggleWishlist, isWishlisted } = useCart();
   const { isAuthenticated, user, showToast } = useAuth();
 
   // Related Products
-  const relatedProducts = PRODUCTS.filter((p) => p.id !== product.id).slice(0, 3);
+  const relatedProducts = products.filter((p) => p.id !== product?.id).slice(0, 3);
 
-  const [selectedImage, setSelectedImage] = useState(product.image);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || 'Standard (6.5 in)');
+  const galleryImages = React.useMemo(() => {
+    const list = product?.gallery?.length
+      ? product.gallery
+      : product?.images?.length
+        ? product.images
+        : product?.image
+          ? [product.image]
+          : [];
+    return [...new Set(list.filter(Boolean))];
+  }, [product]);
+
+  const [slideIndex, setSlideIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState(1);
+  const [sliderPaused, setSliderPaused] = useState(false);
+  const touchStartX = useRef(null);
+
+  const selectedImage = galleryImages[slideIndex] || product?.image || '';
+  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || 'Standard (6.5 in)');
   const [selectedInitial, setSelectedInitial] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [careOpen, setCareOpen] = useState(false);
 
-  // Customer Reviews state persisted per product
-  const reviewsStorageKey = `aura_reviews_${product.id}`;
   const [reviews, setReviews] = useState(INITIAL_REVIEWS);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewText, setReviewText] = useState('');
 
-  // Fix state sync when switching between products
+  const goToSlide = (nextIdx, explicitDir = null) => {
+    if (galleryImages.length <= 1) return;
+    const total = galleryImages.length;
+    const normalized = ((nextIdx % total) + total) % total;
+    setSlideDirection(explicitDir !== null ? explicitDir : normalized >= slideIndex ? 1 : -1);
+    setSlideIndex(normalized);
+  };
+
   useEffect(() => {
-    setSelectedImage(product.image);
-    setSelectedSize(product.sizes[0] || 'Standard (6.5 in)');
+    if (galleryImages.length <= 1 || sliderPaused) return;
+    const timer = setInterval(() => {
+      setSlideDirection(1);
+      setSlideIndex((prev) => (prev + 1) % galleryImages.length);
+    }, 4200);
+    return () => clearInterval(timer);
+  }, [galleryImages.length, sliderPaused]);
+
+  useEffect(() => {
+    let active = true;
+    const baseMatch = products.find((p) => p.id === id || p.slug === id) || products[0];
+    setSlideIndex(0);
+    setSlideDirection(1);
+    if (baseMatch) {
+      setSelectedSize(baseMatch.sizes?.[0] || 'Standard (6.5 in)');
+    }
     setSelectedInitial('');
     setQuantity(1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    try {
-      const saved = localStorage.getItem(reviewsStorageKey);
-      setReviews(saved ? JSON.parse(saved) : INITIAL_REVIEWS);
-    } catch {
-      setReviews(INITIAL_REVIEWS);
-    }
-  }, [id, product.image, product.sizes, reviewsStorageKey]);
+    storefrontApi
+      .getProductDetail(id)
+      .then((res) => {
+        if (!active) return;
+        if (res?.product) {
+          setLiveProduct(res.product);
+          setSelectedSize(res.product.sizes?.[0] || 'Standard (6.5 in)');
+        }
+        if (Array.isArray(res?.reviews) && res.reviews.length > 0) {
+          setReviews(
+            res.reviews.map((r) => ({
+              id: r.id,
+              author: r.authorName,
+              city: 'Verified Buyer',
+              rating: r.rating,
+              date: new Date(r.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }),
+              comment: r.comment
+            }))
+          );
+        } else {
+          setReviews(INITIAL_REVIEWS);
+        }
+      })
+      .catch(() => {
+        if (active) setReviews(INITIAL_REVIEWS);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [id, products]);
 
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
@@ -120,10 +184,11 @@ export default function ProductDetailPage() {
       (selectedInitial ? `- Custom Initial: "${selectedInitial}"%0A` : '') +
       `- Quantity: ${quantity}%0A` +
       `Please let me know how to proceed!`;
-    window.open(`https://wa.me/918780125711?text=${text}`, '_blank');
+    const waNum = (settings.whatsapp_number || '918780125711').replace(/[^0-9]/g, '');
+    window.open(`https://wa.me/${waNum}?text=${text}`, '_blank');
   };
 
-  const handleSubmitReview = (e) => {
+  const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!isAuthenticated) {
       showToast('Please sign in to submit a verified review.', 'gold');
@@ -137,21 +202,26 @@ export default function ProductDetailPage() {
     }
     if (!reviewText.trim()) return;
 
-    const newRev = {
-      id: `rev_${Date.now()}`,
-      author: user.name,
-      city: 'Verified Buyer',
-      rating: reviewRating,
-      date: 'Just now',
-      comment: reviewText.trim(),
-    };
-    const next = [newRev, ...reviews];
-    setReviews(next);
-    setReviewText('');
     try {
-      localStorage.setItem(reviewsStorageKey, JSON.stringify(next));
-    } catch {}
-    showToast('Thank you for your review! ♥', 'gold');
+      const res = await storefrontApi.submitReview(product.slug || product.id, {
+        authorName: user.name,
+        rating: reviewRating,
+        comment: reviewText.trim()
+      });
+      const newRev = {
+        id: res.review.id,
+        author: res.review.authorName,
+        city: 'Verified Buyer',
+        rating: res.review.rating,
+        date: 'Just now',
+        comment: res.review.comment
+      };
+      setReviews((prev) => [newRev, ...prev.filter((r) => !String(r.id).startsWith('r'))]);
+      setReviewText('');
+      showToast('Thank you for your review! ♥', 'gold');
+    } catch (err) {
+      showToast(err.message || 'Unable to submit review.', 'error');
+    }
   };
 
   return (
@@ -170,20 +240,39 @@ export default function ProductDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        {/* Left: Product Images Gallery */}
+        {/* Left: Product Images Animated Slider */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="lg:col-span-7 space-y-4"
         >
-          <div className="relative aspect-square rounded-3xl overflow-hidden bg-ivory-100 border border-gold-300/60 shadow-lg">
-            <span className="absolute top-4 left-4 z-10 px-3.5 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase bg-white/95 text-espresso shadow-sm border border-gold-300">
-              {product.badge}
-            </span>
+          <div
+            onMouseEnter={() => setSliderPaused(true)}
+            onMouseLeave={() => setSliderPaused(false)}
+            onTouchStart={(e) => {
+              touchStartX.current = e.touches[0]?.clientX ?? null;
+              setSliderPaused(true);
+            }}
+            onTouchEnd={(e) => {
+              const startX = touchStartX.current;
+              const endX = e.changedTouches[0]?.clientX;
+              if (startX !== null && endX !== undefined && Math.abs(startX - endX) > 40) {
+                goToSlide(startX > endX ? slideIndex + 1 : slideIndex - 1, startX > endX ? 1 : -1);
+              }
+              touchStartX.current = null;
+              setTimeout(() => setSliderPaused(false), 3000);
+            }}
+            className="relative aspect-square rounded-3xl overflow-hidden bg-ivory-100 border border-gold-300/60 shadow-lg select-none group"
+          >
+            {product.badge && (
+              <span className="absolute top-4 left-4 z-20 px-3.5 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase bg-white/95 text-espresso shadow-sm border border-gold-300">
+                {product.badge}
+              </span>
+            )}
 
             <button
               onClick={() => toggleWishlist(product.id)}
-              className="absolute top-4 right-4 z-10 p-2.5 rounded-full bg-white/95 text-espresso hover:text-rosequartz-500 shadow-sm transition"
+              className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-white/95 text-espresso hover:text-rosequartz-500 shadow-sm transition"
               title="Save to Wishlist"
             >
               <Heart
@@ -193,24 +282,72 @@ export default function ProductDetailPage() {
               />
             </button>
 
-            <img
-              src={selectedImage}
-              alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-500"
-            />
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.img
+                key={selectedImage || slideIndex}
+                src={selectedImage}
+                alt={`${product.name} - photo ${slideIndex + 1}`}
+                initial={{ opacity: 0, x: slideDirection * 48, scale: 0.985 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -slideDirection * 48, scale: 0.985 }}
+                transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full h-full object-cover"
+              />
+            </AnimatePresence>
+
+            {galleryImages.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => goToSlide(slideIndex - 1, -1)}
+                  aria-label="Previous photo"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-2.5 rounded-full bg-white/90 hover:bg-white text-espresso border border-gold-300/70 shadow-md sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                >
+                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => goToSlide(slideIndex + 1, 1)}
+                  aria-label="Next photo"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-2.5 rounded-full bg-white/90 hover:bg-white text-espresso border border-gold-300/70 shadow-md sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                >
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+
+                {/* Slide Progress Dots & Counter */}
+                <div className="absolute bottom-3.5 inset-x-0 z-20 flex items-center justify-center gap-2 pointer-events-none">
+                  <div className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-espresso/70 backdrop-blur-md">
+                    {galleryImages.map((_, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => goToSlide(idx)}
+                        aria-label={`View photo ${idx + 1}`}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          idx === slideIndex ? 'w-5 bg-gold-400' : 'w-1.5 bg-white/55 hover:bg-white'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
-          {product.gallery && product.gallery.length > 1 && (
-            <div className="flex gap-3">
-              {product.gallery.map((img, i) => (
+          {galleryImages.length > 1 && (
+            <div className="flex gap-3 overflow-x-auto pb-1">
+              {galleryImages.map((img, i) => (
                 <button
-                  key={i}
-                  onClick={() => setSelectedImage(img)}
-                  className={`w-20 h-20 rounded-2xl overflow-hidden border-2 transition ${
-                    selectedImage === img ? 'border-gold-500 shadow-md' : 'border-gold-200 opacity-70'
+                  key={`${img}-${i}`}
+                  type="button"
+                  onClick={() => goToSlide(i)}
+                  className={`w-20 h-20 rounded-2xl overflow-hidden border-2 shrink-0 transition-all duration-300 ${
+                    slideIndex === i
+                      ? 'border-gold-500 shadow-md scale-105 opacity-100'
+                      : 'border-gold-200 opacity-65 hover:opacity-95'
                   }`}
                 >
-                  <img src={img} alt="thumbnail" className="w-full h-full object-cover" />
+                  <img src={img} alt={`${product.name} view ${i + 1}`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
@@ -232,7 +369,7 @@ export default function ProductDetailPage() {
               </div>
               <span className="font-bold text-espresso">{product.rating}</span>
               <span className="text-espresso/50">
-                ({product.reviewsCount + reviews.length - INITIAL_REVIEWS.length} verified customer reviews)
+                ({Math.max(reviews.length, product.reviewsCount || 0)} verified customer reviews)
               </span>
             </div>
 
@@ -242,10 +379,14 @@ export default function ProductDetailPage() {
 
             <div className="flex items-baseline gap-3 mt-3">
               <span className="text-3xl font-bold text-gold-700">₹{product.price}</span>
-              <span className="text-base text-espresso/40 line-through">₹{product.originalPrice}</span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">
-                Save {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
-              </span>
+              {product.originalPrice && product.originalPrice > product.price && (
+                <>
+                  <span className="text-base text-espresso/40 line-through">₹{product.originalPrice}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">
+                    Save {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                  </span>
+                </>
+              )}
             </div>
           </div>
 
@@ -253,10 +394,10 @@ export default function ProductDetailPage() {
             {product.description}
           </p>
 
-          {/* Lead Time Badge */}
+          {/* Lead Time / Story Badge */}
           <div className="p-3 rounded-2xl bg-gold-50/80 border border-gold-300/50 flex items-center gap-2.5 text-xs text-gold-900 font-medium">
             <Sparkles className="w-4 h-4 text-gold-600 flex-shrink-0" />
-            <span>{product.leadTime}</span>
+            <span>{product.leadTime || product.story || 'Handcrafted in Studio • Dispatched within 48 hours'}</span>
           </div>
 
           {/* 1. Size Selector */}

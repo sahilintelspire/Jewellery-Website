@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, MessageCircle, Sparkles, CheckCircle2, ChevronRight, ChevronLeft } from 'lucide-react';
 import Hero3DCanvas from './Hero3DCanvas';
-import { PRODUCTS } from '../../data/products';
 import { useCart } from '../../context/CartContext';
+import { useStore } from '../../context/StoreContext';
 
 export default function HeroSection() {
   const { addToCart } = useCart();
-  const featuredCards = PRODUCTS.filter((p) => p.featuredInMockup);
+  const { products, settings } = useStore();
+  const featuredCards = products.filter((p) => p.featuredInMockup || p.isFeatured);
 
   // Motion Sites: View Mode Switcher ('showcase' vs 'process') - Exact match to demo video!
   const [viewMode, setViewMode] = useState('showcase'); // 'showcase' | 'process'
@@ -77,11 +78,12 @@ export default function HeroSection() {
         /* MODE A: 3D ATELIER SHOWCASE */
         <div className="max-w-4xl mx-auto text-center space-y-3 sm:space-y-4 pt-3 sm:pt-4 z-20 transition-all duration-500">
           <h1 className="font-serif-lux text-4xl sm:text-6xl lg:text-[76px] font-bold tracking-tight text-espresso leading-[1.08]">
-            Elegance Handcrafted For You
+            {settings.hero_title || 'Elegance Handcrafted For You'}
           </h1>
 
           <p className="text-espresso/75 text-xs sm:text-base max-w-2xl mx-auto font-light leading-relaxed px-2 sm:px-0">
-            Each piece thoughtfully sculpted by hand with authentic crystals, pearls, and artisanal love.
+            {settings.hero_subtitle ||
+              'Each piece thoughtfully sculpted by hand with authentic crystals, pearls, and artisanal love.'}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-1">
@@ -89,12 +91,12 @@ export default function HeroSection() {
               to="/collections"
               className="w-full sm:w-auto px-9 py-3.5 rounded-full btn-gold-mockup text-xs uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-2"
             >
-              <span>Explore Collection</span>
+              <span>{settings.hero_cta_text || 'Explore Collection'}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
 
             <a
-              href="https://wa.me/918780125711?text=Hi!%20I%20saw%20your%20gorgeous%20handmade%20jewellery%20and%20want%20to%20place%20a%20custom%20order!"
+              href={`https://wa.me/${(settings.whatsapp_number || '918780125711').replace(/[^0-9]/g, '')}?text=Hi!%20I%20saw%20your%20gorgeous%20handmade%20jewellery%20and%20want%20to%20place%20a%20custom%20order!`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto px-7 py-3 rounded-full btn-whatsapp-mockup text-xs uppercase tracking-[0.16em] font-bold flex items-center justify-center gap-2.5"

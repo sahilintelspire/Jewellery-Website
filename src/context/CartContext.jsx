@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useStore } from './StoreContext';
 
 const CartContext = createContext();
 
@@ -7,17 +8,21 @@ const FALLBACK_BRACELET_IMG =
 const BROKEN_IMG_FRAGMENT = 'photo-1611591475152-478311382490';
 
 export function CartProvider({ children }) {
+  const { settings } = useStore();
   const [cart, setCart] = useState(() => {
     try {
       const saved = localStorage.getItem('aura_jewels_cart');
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Clean up any legacy broken unsplash URL from earlier preview sessions
-        return parsed.map((item) =>
-          item.image && item.image.includes(BROKEN_IMG_FRAGMENT)
-            ? { ...item, image: FALLBACK_BRACELET_IMG }
-            : item
-        );
+        if (Array.isArray(parsed)) {
+          return parsed
+            .filter((item) => item && typeof item === 'object')
+            .map((item) =>
+              item.image && item.image.includes(BROKEN_IMG_FRAGMENT)
+                ? { ...item, image: FALLBACK_BRACELET_IMG }
+                : item
+            );
+        }
       }
       return [
         {
@@ -40,7 +45,8 @@ export function CartProvider({ children }) {
   const [wishlist, setWishlist] = useState(() => {
     try {
       const saved = localStorage.getItem('aura_jewels_wishlist');
-      return saved ? JSON.parse(saved) : ['pressed-flower-resin-pendant'];
+      const parsed = saved ? JSON.parse(saved) : ['pressed-flower-resin-pendant'];
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
@@ -79,7 +85,7 @@ export function CartProvider({ children }) {
           shortName: product.shortName || product.name,
           price: product.price,
           originalPrice: product.originalPrice,
-          image: product.image,
+          image: product.image || product.images?.[0] || FALLBACK_BRACELET_IMG,
           size,
           initial,
           quantity,
@@ -126,7 +132,7 @@ export function CartProvider({ children }) {
 
   const cartSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const freeGiftThreshold = 999;
+  const freeGiftThreshold = Number(settings.free_gift_threshold || 999);
   const isFreeGiftUnlocked = cartSubtotal >= freeGiftThreshold;
   const giftProgress = Math.min((cartSubtotal / freeGiftThreshold) * 100, 100);
 

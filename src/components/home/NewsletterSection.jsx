@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
 import { Mail, Sparkles, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-react';
+import { storefrontApi } from '../../services/api';
 
 export default function NewsletterSection() {
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState('idle'); // 'idle' | 'subscribed' | 'error'
+  const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'subscribed' | 'error'
+  const [errMsg, setErrMsg] = useState('Please enter a valid email address.');
 
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
     if (!email || !email.includes('@') || !email.includes('.')) {
+      setErrMsg('Please enter a valid email address.');
       setStatus('error');
       return;
     }
 
+    setStatus('loading');
     try {
-      const existing = JSON.parse(localStorage.getItem('aura_subscribers') || '[]');
-      if (!existing.includes(email)) {
-        existing.push({ email, subscribedAt: new Date().toISOString() });
-        localStorage.setItem('aura_subscribers', JSON.stringify(existing));
-      }
-    } catch (err) {}
-
-    setStatus('subscribed');
+      await storefrontApi.subscribeNewsletter(email, 'homepage');
+      setStatus('subscribed');
+    } catch (err) {
+      setErrMsg(err.message || 'Could not subscribe right now.');
+      setStatus('error');
+    }
   };
 
   return (
@@ -87,7 +89,7 @@ export default function NewsletterSection() {
 
               {status === 'error' && (
                 <p className="text-[11px] text-red-500 mt-2 font-medium">
-                  Please enter a valid email address.
+                  {errMsg}
                 </p>
               )}
             </form>

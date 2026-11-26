@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, ArrowRight, Sparkles } from 'lucide-react';
-import { PRODUCTS } from '../../data/products';
+import { useStore } from '../../context/StoreContext';
 
 export default function SearchModal({ isOpen, onClose }) {
+  const { products } = useStore();
   const [query, setQuery] = useState('');
   const inputRef = useRef(null);
 
@@ -26,14 +27,14 @@ export default function SearchModal({ isOpen, onClose }) {
 
   const cleanQuery = query.trim().toLowerCase();
   const matches = cleanQuery
-    ? PRODUCTS.filter(
+    ? products.filter(
         (p) =>
           p.name.toLowerCase().includes(cleanQuery) ||
-          p.categoryLabel.toLowerCase().includes(cleanQuery) ||
+          (p.categoryLabel || p.category || '').toLowerCase().includes(cleanQuery) ||
           p.description.toLowerCase().includes(cleanQuery) ||
-          p.materials.some((m) => m.toLowerCase().includes(cleanQuery))
+          (p.materials || []).some((m) => m.toLowerCase().includes(cleanQuery))
       )
-    : PRODUCTS.slice(0, 4);
+    : products.slice(0, 4);
 
   return (
     <AnimatePresence>

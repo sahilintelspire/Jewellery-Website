@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useStore } from '../../context/StoreContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -34,6 +35,7 @@ export default function CartDrawer() {
   } = useCart();
 
   const { isAuthenticated, user, addresses, showToast } = useAuth();
+  const { settings } = useStore();
   const navigate = useNavigate();
 
   const [showNote, setShowNote] = useState(false);
@@ -94,7 +96,8 @@ export default function CartDrawer() {
     }
     orderText += `%0APlease confirm my dispatch timeline!`;
 
-    window.open(`https://wa.me/918780125711?text=${orderText}`, '_blank');
+    const waPhone = (settings.whatsapp_number || '918780125711').replace(/[^0-9]/g, '');
+    window.open(`https://wa.me/${waPhone}?text=${orderText}`, '_blank');
   };
 
   return (

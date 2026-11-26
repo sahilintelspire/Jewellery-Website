@@ -1,8 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ShieldCheck, Truck, RefreshCw, MessageCircle, Instagram } from 'lucide-react';
+import { useStore } from '../../context/StoreContext';
 
 export default function Footer() {
+  const { settings } = useStore();
+  const waNum = (settings.whatsapp_number || '918780125711').replace(/[^0-9]/g, '');
+
   return (
     <footer className="bg-ivory-200/60 border-t border-gold-300/40 pt-12 sm:pt-16 pb-20 sm:pb-10 px-4 sm:px-6 lg:px-16 text-espresso">
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-10 sm:mb-12">
@@ -22,7 +26,7 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-3 pt-2 text-gold-700">
             <a
-              href="https://wa.me/918780125711"
+              href={`https://wa.me/${waNum}`}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 rounded-full bg-white border border-gold-300 hover:bg-gold-50 transition"
@@ -31,7 +35,7 @@ export default function Footer() {
               <MessageCircle className="w-4 h-4 text-emerald-600" />
             </a>
             <a
-              href="https://instagram.com"
+              href={settings.instagram_url || 'https://instagram.com'}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 rounded-full bg-white border border-gold-300 hover:bg-gold-50 transition"

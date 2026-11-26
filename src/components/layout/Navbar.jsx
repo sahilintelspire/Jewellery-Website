@@ -14,14 +14,17 @@ import {
   LogOut,
   ChevronDown,
   LogIn,
+  Shield,
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useStore } from '../../context/StoreContext';
 import SearchModal from './SearchModal';
 
 export default function Navbar() {
   const { cartCount, wishlist, setIsCartOpen } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
+  const { settings } = useStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -64,13 +67,20 @@ export default function Navbar() {
   return (
     <>
       {/* 1. TOP ANNOUNCEMENT BAR */}
-      <div className="bg-gradient-to-r from-gold-700 via-gold-500 to-gold-700 text-white text-[10px] sm:text-xs tracking-[0.06em] sm:tracking-[0.2em] uppercase font-semibold py-1.5 sm:py-2 px-3 sm:px-4 text-center relative z-50 shadow-sm flex items-center justify-center gap-1.5 sm:gap-2 leading-snug">
-        <Sparkles className="w-3.5 h-3.5 animate-pulse text-gold-200 hidden sm:inline" />
-        <span>
-          Free Velvet Gift Box Above ₹999 • Code <strong className="underline">AURA10</strong> for 10% Off
-        </span>
-        <Sparkles className="w-3.5 h-3.5 animate-pulse text-gold-200 hidden sm:inline" />
-      </div>
+      {settings.announcement_enabled !== false && (
+        <div className="bg-gradient-to-r from-gold-700 via-gold-500 to-gold-700 text-white text-[10px] sm:text-xs tracking-[0.06em] sm:tracking-[0.2em] uppercase font-semibold py-1.5 sm:py-2 px-3 sm:px-4 text-center relative z-50 shadow-sm flex items-center justify-center gap-1.5 sm:gap-2 leading-snug">
+          <Sparkles className="w-3.5 h-3.5 animate-pulse text-gold-200 hidden sm:inline" />
+          <span>
+            {settings.announcement_text || (
+              <>
+                Free Velvet Gift Box Above ₹{settings.free_gift_threshold || 999} • Code{' '}
+                <strong className="underline">AURA10</strong> for 10% Off
+              </>
+            )}
+          </span>
+          <Sparkles className="w-3.5 h-3.5 animate-pulse text-gold-200 hidden sm:inline" />
+        </div>
+      )}
 
       {/* 2. MAIN LUXURY NAVBAR */}
       <nav className="sticky top-0 z-40 bg-ivory-100/95 backdrop-blur-md border-b border-gold-300/40 px-3 sm:px-6 lg:px-16 py-3 sm:py-3.5 transition-all duration-300">
@@ -189,6 +199,15 @@ export default function Navbar() {
                         <Heart className="w-3.5 h-3.5 text-rosequartz-500" />
                         <span>Saved Wishlist ({wishlist.length})</span>
                       </Link>
+                      {user?.role === 'admin' && (
+                        <Link
+                          to="/admin"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-[#F8EFE2] hover:bg-gold-100 text-gold-900 font-semibold transition mt-1"
+                        >
+                          <Shield className="w-3.5 h-3.5 text-gold-700" />
+                          <span>Studio Admin Panel</span>
+                        </Link>
+                      )}
 
                       <button
                         type="button"

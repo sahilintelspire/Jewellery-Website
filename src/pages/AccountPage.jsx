@@ -20,6 +20,8 @@ import {
   Briefcase,
   Gift,
   ShieldCheck,
+  Wand2,
+  ExternalLink,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -38,14 +40,14 @@ export default function AccountPage() {
     user,
     addresses,
     orders,
+    customOrders,
     logout,
     updateProfile,
     addAddress,
     updateAddress,
     deleteAddress,
     setDefaultAddress,
-    cancelOrder,
-    advanceOrderStatus,
+    refreshAccountData,
     showToast,
   } = useAuth();
   const { wishlist, addToCart, setIsCartOpen } = useCart();
@@ -64,7 +66,7 @@ export default function AccountPage() {
 
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['orders', 'addresses', 'profile'].includes(tabParam)) {
+    if (tabParam && ['orders', 'custom', 'addresses', 'profile'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [searchParams]);
@@ -94,10 +96,21 @@ export default function AccountPage() {
 
   const handleReorder = (order) => {
     order.items.forEach((item, idx) => {
-      addToCart(item, item.size, item.initial, item.quantity, idx === order.items.length - 1);
+      addToCart(
+        {
+          id: item.productSlug || item.id,
+          name: item.name,
+          price: item.price,
+          image: item.image
+        },
+        item.selectedSize || item.size || 'Standard Fit',
+        item.initial || '',
+        item.quantity,
+        idx === order.items.length - 1
+      );
     });
     setIsCartOpen(true);
-    showToast(`Added items from ${order.id} back to your Bag!`, 'gold');
+    showToast(`Added items from ${order.orderNumber || order.id} back to your Bag!`, 'gold');
   };
 
   const firstName = user?.name?.split(' ')[0] || 'Member';
@@ -160,9 +173,10 @@ export default function AccountPage() {
       </motion.div>
 
       {/* ANIMATED TAB BAR */}
-      <div className="w-full sm:w-auto grid grid-cols-3 sm:inline-flex p-1.5 rounded-2xl bg-white border border-gold-200 shadow-sm gap-1">
+      <div className="w-full sm:w-auto grid grid-cols-2 sm:inline-flex p-1.5 rounded-2xl bg-white border border-gold-200 shadow-sm gap-1">
         {[
           { id: 'orders', label: `My Orders (${orders.length})`, short: `Orders (${orders.length})`, icon: Package },
+          { id: 'custom', label: `Custom Pieces (${customOrders.length})`, short: `Custom (${customOrders.length})`, icon: Wand2 },
           { id: 'addresses', label: `Saved Addresses (${addresses.length})`, short: `Address (${addresses.length})`, icon: MapPin },
           { id: 'profile', label: 'Profile & Security', short: 'Profile', icon: User },
         ].map((tab) => {
@@ -223,8 +237,11 @@ export default function AccountPage() {
               </div>
             ) : (
               orders.map((order) => {
-                const isCancelled = order.status === 'Cancelled' || order.statusStep < 0;
-                const currentStep = Math.max(0, order.statusStep ?? 0);
+                const statusLabel = order.orderStatus || order.status || 'Order Placed';
+                const isCancelled = statusLabel === 'Cancelled';
+                const stageIdx = ORDER_STAGES.indexOf(statusLabel);
+                const currentStep = stageIdx >= 0 ? stageIdx : 0;
+                const shipAddr = order.shippingAddress || order.address || {};
 
                 return (
                   <div
@@ -236,7 +253,7 @@ export default function AccountPage() {
                       <div className="space-y-1">
                         <div className="flex flex-wrap items-center gap-2.5">
                           <h3 className="font-serif-lux text-2xl font-bold text-espresso">
-                            Order {order.id}
+                            Order {order.orderNumber || order.id}
                           </h3>
                           <span
                             className={`px-3 py-0.5 rounded-full text-[10px] uppercase tracking-wider font-bold ${
@@ -247,7 +264,7 @@ export default function AccountPage() {
                                 : 'bg-gold-100 text-gold-900'
                             }`}
                           >
-                            {order.status}
+                            {statusLabel}
                           </span>
                         </div>
                         <p className="text-xs text-espresso/60">
@@ -257,7 +274,7 @@ export default function AccountPage() {
                             month: 'short',
                             year: 'numeric',
                           })}{' '}
-                          • {order.paymentMethod} ({order.paymentStatus})
+                          • {order.paymentMethod?.toUpperCase()} ({order.paymentStatus})
                         </p>
                       </div>
 
@@ -266,7 +283,7 @@ export default function AccountPage() {
                           Order Total
                         </span>
                         <span className="text-2xl font-bold text-gold-800">
-                          ₹{order.total.toLocaleString('en-IN')}
+                          ₹{(order.totalAmount ?? order.total ?? 0).toLocaleString('en-IN')}
                         </span>
                       </div>
                     </div>
@@ -277,18 +294,29 @@ export default function AccountPage() {
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] font-bold text-espresso/65 mb-3">
                           <span className="flex items-center gap-1.5 text-emerald-700">
                             <Truck className="w-4 h-4 flex-shrink-0" />
-                            <span>Est. Delivery: {order.estimatedDelivery}</span>
+                            <span>
+                              {order.courierName && order.trackingNumber
+                                ? `${order.courierName} • AWB: ${order.trackingNumber}`
+                                : 'Artisan Studio Delivery • 3-5 Business Days'}
+                            </span>
+                            {order.trackingUrl && (
+                              <a
+                                href={order.trackingUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 underline text-gold-700 ml-2"
+                              >
+                                Track <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
                           </span>
-                          {currentStep < 4 && (
-                            <button
-                              type="button"
-                              onClick={() => advanceOrderStatus(order.id)}
-                              className="self-start sm:self-auto text-[10px] px-3 py-1 rounded-full bg-ivory-100 hover:bg-gold-100 border border-gold-300 text-gold-800 transition"
-                              title="Simulate next crafting/delivery milestone"
-                            >
-                              ↻ Simulate Next Tracking Stage
-                            </button>
-                          )}
+                          <button
+                            type="button"
+                            onClick={refreshAccountData}
+                            className="self-start sm:self-auto text-[10px] px-3 py-1 rounded-full bg-ivory-100 hover:bg-gold-100 border border-gold-300 text-gold-800 transition"
+                          >
+                            ↻ Refresh Live Status
+                          </button>
                         </div>
 
                         {/* Mobile Vertical Stepper */}
@@ -367,18 +395,17 @@ export default function AccountPage() {
                             />
                             <div className="flex-1 min-w-0">
                               <Link
-                                to={`/product/${item.id}`}
+                                to={`/product/${item.productSlug || item.id}`}
                                 className="font-serif-lux text-base font-bold text-espresso hover:text-gold-700 truncate block"
                               >
                                 {item.name}
                               </Link>
                               <p className="text-[11px] text-espresso/60">
-                                Qty: {item.quantity} • {item.size}
-                                {item.initial ? ` • Initial: "${item.initial}"` : ''}
+                                Qty: {item.quantity} • {item.selectedSize || item.size}
                               </p>
                             </div>
                             <span className="font-bold text-xs text-gold-800">
-                              ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                              ₹{(item.lineTotal ?? item.price * item.quantity).toLocaleString('en-IN')}
                             </span>
                           </div>
                         ))}
@@ -386,17 +413,17 @@ export default function AccountPage() {
 
                       <div className="lg:col-span-5 p-4 rounded-2xl bg-ivory-50 border border-gold-200/70 text-xs space-y-2">
                         <p className="text-[10px] uppercase tracking-wider font-bold text-gold-700">
-                          Shipping Address ({order.address?.type || 'Home'})
+                          Shipping Address ({shipAddr.type || 'Home'})
                         </p>
-                        <p className="font-bold text-espresso">{order.address?.fullName}</p>
+                        <p className="font-bold text-espresso">{shipAddr.fullName}</p>
                         <p className="text-espresso/75 leading-relaxed">
-                          {order.address?.houseNo}, {order.address?.area}, {order.address?.city},{' '}
-                          {order.address?.state} — {order.address?.pincode}
+                          {shipAddr.houseNo || shipAddr.line1}, {shipAddr.area || shipAddr.line2}, {shipAddr.city},{' '}
+                          {shipAddr.state} — {shipAddr.pincode}
                         </p>
-                        <p className="text-espresso/75">Phone: +91 {order.address?.phone}</p>
+                        <p className="text-espresso/75">Phone: +91 {shipAddr.phone}</p>
                         {order.couponCode && (
                           <p className="text-emerald-700 font-semibold pt-1">
-                            Promo Applied: {order.couponCode} (-₹{order.discount})
+                            Promo Applied: {order.couponCode} (-₹{order.discountAmount ?? order.discount ?? 0})
                           </p>
                         )}
                       </div>
@@ -412,21 +439,72 @@ export default function AccountPage() {
                         <RefreshCw className="w-3.5 h-3.5" />
                         <span>Reorder Items</span>
                       </button>
-
-                      {!isCancelled && currentStep < 3 && (
-                        <button
-                          type="button"
-                          onClick={() => cancelOrder(order.id)}
-                          className="px-4 py-2.5 rounded-full border border-red-200 hover:bg-red-50 text-red-600 text-xs font-bold flex items-center gap-1.5 transition"
-                        >
-                          <XCircle className="w-3.5 h-3.5" />
-                          <span>Cancel Order</span>
-                        </button>
-                      )}
                     </div>
                   </div>
                 );
               })
+            )}
+          </motion.div>
+        )}
+
+        {/* TAB 1B: CUSTOM COMMISSIONS */}
+        {activeTab === 'custom' && (
+          <motion.div
+            key="tab-custom"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            className="space-y-4"
+          >
+            {customOrders.length === 0 ? (
+              <div className="text-center py-16 px-6 rounded-3xl bg-white border border-gold-200 shadow-sm max-w-lg mx-auto space-y-4">
+                <div className="w-16 h-16 rounded-full bg-gold-50 border border-gold-200 text-gold-600 mx-auto flex items-center justify-center">
+                  <Wand2 className="w-7 h-7" />
+                </div>
+                <h2 className="font-serif-lux text-2xl font-bold text-espresso">
+                  No Custom Requests Yet
+                </h2>
+                <p className="text-xs text-espresso/60">
+                  Have a dream crystal piece or Pinterest design? Submit your request in Custom Studio and track your studio quote right here!
+                </p>
+                <Link
+                  to="/custom-order"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass-gold-btn text-xs uppercase tracking-wider font-bold"
+                >
+                  <span>Design Your Own</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            ) : (
+              customOrders.map((req) => (
+                <div key={req.id} className="rounded-3xl bg-white border border-gold-200/90 shadow-sm p-6 space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-gold-100">
+                    <div>
+                      <span className="text-xs font-bold tracking-wider text-gold-700">{req.requestCode}</span>
+                      <h3 className="font-serif-lux text-2xl font-bold text-espresso">
+                        {req.jewelryType} — {req.crystal}
+                      </h3>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-gold-100 text-gold-900 text-xs font-bold">
+                      {req.status}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-espresso/75">
+                    <div><strong>Finish:</strong> {req.finishStyle || 'Atelier Standard'}</div>
+                    <div><strong>Budget Tier:</strong> {req.budget}</div>
+                    <div>
+                      <strong>Studio Quote:</strong>{' '}
+                      {req.quotedPrice ? `₹${req.quotedPrice.toLocaleString('en-IN')}` : 'Pending Review'}
+                    </div>
+                  </div>
+                  {req.adminReply && (
+                    <div className="rounded-2xl bg-[#FBF7F0] border border-gold-300/60 p-3.5 text-xs text-espresso">
+                      <span className="font-bold text-gold-800">Studio Message: </span>
+                      {req.adminReply}
+                    </div>
+                  )}
+                </div>
+              ))
             )}
           </motion.div>
         )}
@@ -473,11 +551,11 @@ export default function AccountPage() {
                   setEditingAddr(null);
                   setShowAddrForm(false);
                 }}
-                onSave={(data) => {
+                onSave={async (data) => {
                   if (editingAddr) {
-                    updateAddress(editingAddr.id, data);
+                    await updateAddress(editingAddr.id, data);
                   } else {
-                    addAddress(data);
+                    await addAddress(data);
                   }
                   setEditingAddr(null);
                   setShowAddrForm(false);

@@ -3,14 +3,15 @@ import { Link } from 'react-router-dom';
 import { Heart, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { PRODUCTS } from '../data/products';
+import { useStore } from '../context/StoreContext';
 import ProductCard from '../components/common/ProductCard';
 
 export default function WishlistPage() {
   const { wishlist, toggleWishlist, clearWishlist } = useCart();
   const { showToast } = useAuth();
+  const { products } = useStore();
 
-  const wishlistedProducts = PRODUCTS.filter((p) => wishlist.includes(p.id));
+  const wishlistedProducts = products.filter((p) => wishlist.includes(p.id));
 
   return (
     <div className="min-h-screen py-8 sm:py-12 px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto">

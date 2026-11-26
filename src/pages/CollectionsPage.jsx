@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, SlidersHorizontal, Sparkles } from 'lucide-react';
-import { PRODUCTS, CATEGORIES } from '../data/products';
+import { useStore } from '../context/StoreContext';
 import ProductCard from '../components/common/ProductCard';
 
 export default function CollectionsPage() {
+  const { products, categories } = useStore();
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get('category') || 'all';
 
@@ -27,13 +28,14 @@ export default function CollectionsPage() {
   };
 
   // Filter & Sort Logic
-  const filtered = PRODUCTS.filter((p) => {
-    const matchesCategory = activeCategory === 'all' || p.category === activeCategory;
+  const filtered = products.filter((p) => {
+    const catSlug = p.categorySlug || p.category;
+    const matchesCategory = activeCategory === 'all' || catSlug === activeCategory;
     const q = searchQuery.toLowerCase();
     const matchesSearch =
       p.name.toLowerCase().includes(q) ||
       p.description.toLowerCase().includes(q) ||
-      p.materials.some((m) => m.toLowerCase().includes(q));
+      (p.materials || []).some((m) => m.toLowerCase().includes(q));
     return matchesCategory && matchesSearch;
   });
 
@@ -92,7 +94,7 @@ export default function CollectionsPage() {
 
       {/* Category Pills */}
       <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-10">
-        {CATEGORIES.map((cat) => (
+        {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => handleCategoryChange(cat.id)}
@@ -102,8 +104,8 @@ export default function CollectionsPage() {
                 : 'bg-white text-espresso/70 border border-gold-200 hover:border-gold-400'
             }`}
           >
-            {cat.label} (
-            {cat.id === 'all' ? PRODUCTS.length : PRODUCTS.filter((p) => p.category === cat.id).length}
+            {cat.label || cat.name} (
+            {cat.id === 'all' ? products.length : products.filter((p) => (p.categorySlug || p.category) === cat.id).length}
             )
           </button>
         ))}

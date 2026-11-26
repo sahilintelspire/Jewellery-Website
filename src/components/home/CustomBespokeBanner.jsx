@@ -1,8 +1,12 @@
 import React from 'react';
 import { Sparkles, MessageCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useStore } from '../../context/StoreContext';
 
 export default function CustomBespokeBanner() {
+  const { settings } = useStore();
+  const waNum = (settings.whatsapp_number || '918780125711').replace(/[^0-9]/g, '');
+
   return (
     <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-16">
       <div className="max-w-5xl mx-auto rounded-3xl bg-gradient-to-r from-gold-100 via-ivory-100 to-rosequartz-100 p-6 sm:p-14 border border-gold-300 shadow-luxury text-center relative overflow-hidden">
@@ -35,7 +39,7 @@ export default function CustomBespokeBanner() {
             </Link>
 
             <a
-              href="https://wa.me/918780125711?text=Hi!%20I%20have%20a%20custom%20jewellery%20design%20reference%20photo%20to%20share!"
+              href={`https://wa.me/${waNum}?text=Hi!%20I%20have%20a%20custom%20jewellery%20design%20reference%20photo%20to%20share!`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white hover:bg-gold-50 text-emerald-700 border border-emerald-400 text-xs uppercase tracking-wider font-bold flex items-center justify-center gap-2 shadow-sm transition"

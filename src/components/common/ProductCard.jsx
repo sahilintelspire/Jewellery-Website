@@ -14,6 +14,25 @@ export default function ProductCard({
   const { addToCart, toggleWishlist, isWishlisted } = useCart();
   const { showToast } = useAuth();
   const wishlisted = isWishlisted(product.id);
+  const [imgIdx, setImgIdx] = React.useState(0);
+  const [hovered, setHovered] = React.useState(false);
+
+  const cardImages = React.useMemo(() => {
+    const list = product.images?.length ? product.images : product.gallery?.length ? product.gallery : [product.image];
+    return [...new Set(list.filter(Boolean))];
+  }, [product]);
+
+  React.useEffect(() => {
+    if (!hovered || cardImages.length <= 1) {
+      setImgIdx(0);
+      return;
+    }
+    setImgIdx(1);
+    const timer = setInterval(() => {
+      setImgIdx((prev) => (prev + 1) % cardImages.length);
+    }, 1500);
+    return () => clearInterval(timer);
+  }, [hovered, cardImages.length]);
 
   const handleToggleWishlist = () => {
     toggleWishlist(product.id);
@@ -41,10 +60,16 @@ export default function ProductCard({
       className="group bg-white rounded-3xl p-4 border border-gold-200/80 hover:border-gold-400 shadow-sm hover:shadow-card-lift transition-all duration-500 flex flex-col justify-between"
     >
       {/* Image & Badges */}
-      <div className="relative aspect-square rounded-2xl overflow-hidden bg-ivory-100 mb-4">
-        <span className="absolute top-3 left-3 z-10 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-white/95 backdrop-blur-md text-espresso shadow-sm border border-gold-200">
-          {product.badge}
-        </span>
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className="relative aspect-square rounded-2xl overflow-hidden bg-ivory-100 mb-4"
+      >
+        {product.badge && (
+          <span className="absolute top-3 left-3 z-10 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-white/95 backdrop-blur-md text-espresso shadow-sm border border-gold-200">
+            {product.badge}
+          </span>
+        )}
 
         <button
           type="button"
@@ -65,11 +90,24 @@ export default function ProductCard({
 
         <Link to={`/product/${product.id}`} className="block w-full h-full">
           <img
-            src={product.image}
+            src={cardImages[imgIdx] || product.image}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
           />
         </Link>
+
+        {cardImages.length > 1 && (
+          <div className="absolute bottom-2.5 inset-x-0 z-10 flex justify-center gap-1 pointer-events-none">
+            {cardImages.map((_, i) => (
+              <span
+                key={i}
+                className={`h-1 rounded-full transition-all duration-300 ${
+                  i === imgIdx ? 'w-3.5 bg-gold-400 shadow-sm' : 'w-1 bg-white/75'
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Product Info */}
@@ -94,7 +132,9 @@ export default function ProductCard({
       {/* Price & Golden Add to Bag CTA */}
       <div className="mt-5 pt-4 border-t border-gold-100 flex items-center justify-between">
         <div>
-          <span className="text-xs text-espresso/40 line-through">₹{product.originalPrice}</span>
+          {product.originalPrice && product.originalPrice > product.price && (
+            <span className="text-xs text-espresso/40 line-through">₹{product.originalPrice}</span>
+          )}
           <p className="text-xl font-bold text-gold-700">₹{product.price}</p>
         </div>
 

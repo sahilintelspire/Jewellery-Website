@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Sparkles } from 'lucide-react';
-import { PRODUCTS, CATEGORIES } from '../../data/products';
+import { useStore } from '../../context/StoreContext';
 import ProductCard from '../common/ProductCard';
 
 export default function SignatureDrop() {
+  const { featuredProducts, products, categories } = useStore();
   const [activeTab, setActiveTab] = useState('all');
 
+  const sourceList = activeTab === 'all' ? (featuredProducts.length ? featuredProducts : products) : products;
   const filteredProducts =
-    activeTab === 'all' ? PRODUCTS : PRODUCTS.filter((p) => p.category === activeTab);
+    activeTab === 'all' ? sourceList : sourceList.filter((p) => (p.categorySlug || p.category) === activeTab);
 
   return (
     <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto">
@@ -27,7 +29,7 @@ export default function SignatureDrop() {
 
       {/* Filter Tabs */}
       <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-12">
-        {CATEGORIES.map((tab) => (
+        {categories.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -37,7 +39,7 @@ export default function SignatureDrop() {
                 : 'bg-white/80 text-espresso/70 border border-gold-200 hover:border-gold-400 hover:text-espresso'
             }`}
           >
-            {tab.label}
+            {tab.label || tab.name}
           </button>
         ))}
       </div>

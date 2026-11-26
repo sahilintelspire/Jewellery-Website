@@ -24,19 +24,33 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useStore } from '../context/StoreContext';
+import { storefrontApi } from '../services/api';
 import AddressForm from '../components/checkout/AddressForm';
 import RazorpayMockModal from '../components/checkout/RazorpayMockModal';
 
-const AVAILABLE_COUPONS = {
-  AURA10: { code: 'AURA10', type: 'percent', value: 10, minOrder: 0, label: '10% Off Atelier Welcome' },
-  WELCOME200: { code: 'WELCOME200', type: 'flat', value: 200, minOrder: 1200, label: '₹200 Off Orders ₹1200+' },
-  FREESHIP: { code: 'FREESHIP', type: 'shipping', value: 120, minOrder: 0, label: 'Free Express Priority Delivery' },
-};
+const SAMPLE_COUPON_CODES = [
+  { code: 'AURA10', label: '10% Off' },
+  { code: 'WELCOME200', label: '₹200 Off Orders ₹999+' },
+  { code: 'FREESHIP', label: 'Free Shipping' }
+];
+
+function loadRazorpayCheckoutScript() {
+  return new Promise((resolve) => {
+    if (window.Razorpay) return resolve(true);
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 export default function CheckoutPage() {
   const { user, addresses, addAddress, updateAddress, deleteAddress, setDefaultAddress, placeOrder, showToast } =
     useAuth();
   const { cart, cartSubtotal, clearCart, isFreeGiftUnlocked, freeGiftThreshold, giftNote, setGiftNote } = useCart();
+  const { settings, refreshStore } = useStore();
 
   const [step, setStep] = useState(1); // 1: Address, 2: Packaging & Shipping, 3: Payment, 4: Confirmed
   const [selectedAddressId, setSelectedAddressId] = useState(null);
@@ -54,6 +68,8 @@ export default function CheckoutPage() {
   const [couponError, setCouponError] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('razorpay'); // 'razorpay' | 'cod'
   const [isRazorpayOpen, setIsRazorpayOpen] = useState(false);
+  const [pendingDemoOrderId, setPendingDemoOrderId] = useState(null);
+  const [placingOrder, setPlacingOrder] = useState(false);
 
   // Step 4: Confirmed Order & Mobile Summary Toggle
   const [confirmedOrder, setConfirmedOrder] = useState(null);
@@ -74,90 +90,160 @@ export default function CheckoutPage() {
 
   const activeAddress = addresses.find((a) => a.id === selectedAddressId) || null;
 
-  // Pricing Calculations
+  // Dynamic Pricing Calculations synced with Studio Settings
+  const freeShippingThreshold = Number(settings.free_shipping_threshold ?? 999);
+  const standardFee = Number(settings.standard_shipping_fee ?? 80);
+  const expressFee = Number(settings.express_shipping_fee ?? 120);
+  const velvetFeeSetting = Number(settings.velvet_box_upgrade_fee ?? 99);
+
   const baseShipping =
     deliverySpeed === 'express'
-      ? 120
-      : cartSubtotal >= freeGiftThreshold
-      ? 0
-      : 80;
+      ? expressFee
+      : cartSubtotal >= freeShippingThreshold
+        ? 0
+        : standardFee;
 
-  const velvetUpgradeFee = !isFreeGiftUnlocked && upgradeVelvetBox ? 99 : 0;
+  const velvetUpgradeFee = !isFreeGiftUnlocked && upgradeVelvetBox ? velvetFeeSetting : 0;
 
   let discount = 0;
   let shippingFee = baseShipping;
   if (appliedCoupon) {
-    if (appliedCoupon.type === 'percent') {
-      discount = Math.round((cartSubtotal * appliedCoupon.value) / 100);
-    } else if (appliedCoupon.type === 'flat' && cartSubtotal >= appliedCoupon.minOrder) {
-      discount = appliedCoupon.value;
-    } else if (appliedCoupon.type === 'shipping') {
+    if (appliedCoupon.discountType === 'percent') {
+      discount = Math.round((cartSubtotal * appliedCoupon.discountValue) / 100);
+      if (appliedCoupon.maxDiscount) discount = Math.min(discount, appliedCoupon.maxDiscount);
+    } else if (appliedCoupon.discountType === 'flat' && cartSubtotal >= (appliedCoupon.minOrder || 0)) {
+      discount = Math.min(cartSubtotal, appliedCoupon.discountValue);
+    } else if (appliedCoupon.discountType === 'freeship') {
       shippingFee = 0;
     }
   }
 
-  const grandTotal = Math.max(0, cartSubtotal - discount + shippingFee + velvetUpgradeFee);
+  const grandTotal = Math.max(1, cartSubtotal - discount + shippingFee + velvetUpgradeFee);
 
-  const handleApplyCoupon = (codeToTry) => {
+  const handleApplyCoupon = async (codeToTry) => {
     const clean = (codeToTry ?? couponInput).trim().toUpperCase();
     setCouponError('');
     if (!clean) return;
-    const found = AVAILABLE_COUPONS[clean];
-    if (!found) {
-      return setCouponError('Invalid coupon code. Try AURA10, WELCOME200, or FREESHIP.');
-    }
-    if (cartSubtotal < found.minOrder) {
-      return setCouponError(`Minimum order of ₹${found.minOrder} required for ${found.code}.`);
-    }
-    setAppliedCoupon(found);
-    setCouponInput(found.code);
-    showToast(`Coupon ${found.code} applied! ✨`, 'gold');
-  };
-
-  const finalizeOrder = (methodLabel, paymentStatus = 'Paid') => {
-    if (!activeAddress) return;
-    const order = placeOrder({
-      items: cart,
-      subtotal: cartSubtotal,
-      discount,
-      shipping: shippingFee + velvetUpgradeFee,
-      total: grandTotal,
-      couponCode: appliedCoupon?.code || '',
-      giftNote,
-      ribbonStyle,
-      deliverySpeed:
-        deliverySpeed === 'express'
-          ? 'Atelier Priority Express (2-3 Days)'
-          : 'Standard Insured Courier (3-5 Days)',
-      paymentMethod: methodLabel,
-      paymentStatus,
-      address: activeAddress,
-    });
-
-    setConfirmedOrder(order);
-    clearCart();
-    setIsRazorpayOpen(false);
-    setStep(4);
-
     try {
-      confetti({
-        particleCount: 110,
-        spread: 85,
-        origin: { y: 0.55 },
-        colors: ['#D4AF37', '#F3E5AB', '#F3DAD5', '#E91E63', '#FFFFFF'],
-      });
-    } catch {}
+      const res = await storefrontApi.validateCoupon(clean, cartSubtotal, baseShipping);
+      setAppliedCoupon(res.coupon);
+      setCouponInput(res.coupon.code);
+      showToast(`Coupon ${res.coupon.code} applied! ✨`, 'gold');
+    } catch (err) {
+      setCouponError(err.message || 'Invalid coupon code.');
+    }
   };
 
-  const handlePlaceOrderClick = () => {
+  const finalizeOrder = async ({
+    method = 'razorpay',
+    razorpayOrderId = '',
+    razorpayPaymentId = '',
+    razorpaySignature = ''
+  }) => {
+    if (!activeAddress) return;
+    setPlacingOrder(true);
+    try {
+      const order = await placeOrder({
+        items: cart.map((c) => ({
+          id: c.id,
+          slug: c.slug || c.id,
+          name: c.name,
+          quantity: c.quantity,
+          selectedSize: c.size || c.selectedSize || 'Standard Fit'
+        })),
+        shippingAddress: {
+          ...activeAddress,
+          email: user?.email || '',
+          line1: activeAddress.line1 || activeAddress.houseNo,
+          line2: activeAddress.line2 || activeAddress.area || ''
+        },
+        giftNote,
+        velvetBoxUpgraded: upgradeVelvetBox,
+        deliveryMethod: deliverySpeed,
+        couponCode: appliedCoupon?.code || '',
+        paymentMethod: method,
+        razorpayOrderId,
+        razorpayPaymentId,
+        razorpaySignature
+      });
+
+      setConfirmedOrder(order);
+      clearCart();
+      setIsRazorpayOpen(false);
+      setPendingDemoOrderId(null);
+      setStep(4);
+      refreshStore();
+
+      try {
+        confetti({
+          particleCount: 110,
+          spread: 85,
+          origin: { y: 0.55 },
+          colors: ['#D4AF37', '#F3E5AB', '#F3DAD5', '#E91E63', '#FFFFFF'],
+        });
+      } catch {}
+    } catch (err) {
+      showToast(err.message || 'Unable to place order cleanly.', 'error');
+    } finally {
+      setPlacingOrder(false);
+    }
+  };
+
+  const handlePlaceOrderClick = async () => {
     if (!activeAddress) {
       setStep(1);
       return showToast('Please add and select a delivery address first.', 'rose');
     }
-    if (paymentMethod === 'razorpay') {
-      setIsRazorpayOpen(true);
-    } else {
-      finalizeOrder('Cash on Delivery (COD)', 'Pending on Delivery');
+    if (paymentMethod === 'cod') {
+      return finalizeOrder({ method: 'cod' });
+    }
+
+    setPlacingOrder(true);
+    try {
+      const rzp = await storefrontApi.createRazorpayOrder({
+        items: cart.map((c) => ({ id: c.id, slug: c.slug || c.id, quantity: c.quantity })),
+        couponCode: appliedCoupon?.code || '',
+        deliveryMethod: deliverySpeed,
+        velvetBoxUpgraded: upgradeVelvetBox
+      });
+
+      if (rzp.mode === 'live' && rzp.keyId) {
+        const sdkLoaded = await loadRazorpayCheckoutScript();
+        if (!sdkLoaded || !window.Razorpay) {
+          throw new Error('Could not load Razorpay Checkout SDK. Check internet connection.');
+        }
+
+        const rzpInstance = new window.Razorpay({
+          key: rzp.keyId,
+          amount: rzp.amount,
+          currency: rzp.currency || 'INR',
+          name: settings.brand_name || 'AURA JEWELS',
+          description: 'Handcrafted Jewellery Atelier Order',
+          order_id: rzp.razorpayOrderId,
+          prefill: {
+            name: activeAddress.fullName,
+            email: user?.email || '',
+            contact: activeAddress.phone
+          },
+          theme: { color: '#D4AF37' },
+          handler: (response) => {
+            finalizeOrder({
+              method: 'razorpay',
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature
+            });
+          }
+        });
+        rzpInstance.open();
+      } else {
+        setPendingDemoOrderId(rzp.razorpayOrderId);
+        setIsRazorpayOpen(true);
+      }
+    } catch (err) {
+      showToast(err.message || 'Could not initiate payment.', 'error');
+    } finally {
+      setPlacingOrder(false);
     }
   };
 
@@ -321,7 +407,8 @@ export default function CheckoutPage() {
                 Thank You, {user?.name?.split(' ')[0]}!
               </h1>
               <p className="text-xs sm:text-sm text-espresso/70 max-w-md mx-auto">
-                Your handcrafted jewellery order <strong className="text-gold-800">{confirmedOrder.id}</strong> is confirmed and assigned to our artisan studio.
+                Your handcrafted jewellery order{' '}
+                <strong className="text-gold-800">{confirmedOrder.orderNumber || confirmedOrder.id}</strong> is confirmed and assigned to our artisan studio.
               </p>
             </div>
 
@@ -331,14 +418,16 @@ export default function CheckoutPage() {
                 <span className="text-[10px] uppercase tracking-wider text-espresso/50 font-bold">
                   Order Number
                 </span>
-                <p className="text-sm font-bold text-espresso mt-0.5">{confirmedOrder.id}</p>
+                <p className="text-sm font-bold text-espresso mt-0.5">
+                  {confirmedOrder.orderNumber || confirmedOrder.id}
+                </p>
               </div>
               <div>
                 <span className="text-[10px] uppercase tracking-wider text-espresso/50 font-bold">
-                  Estimated Delivery
+                  Studio Status
                 </span>
                 <p className="text-sm font-bold text-emerald-700 mt-0.5">
-                  {confirmedOrder.estimatedDelivery}
+                  {confirmedOrder.orderStatus || 'Order Placed'}
                 </p>
               </div>
               <div>
@@ -346,38 +435,43 @@ export default function CheckoutPage() {
                   Payment & Total
                 </span>
                 <p className="text-sm font-bold text-gold-700 mt-0.5">
-                  ₹{confirmedOrder.total.toLocaleString('en-IN')} ({confirmedOrder.paymentStatus})
+                  ₹{(confirmedOrder.totalAmount ?? confirmedOrder.total ?? 0).toLocaleString('en-IN')} ({confirmedOrder.paymentStatus})
                 </p>
               </div>
             </div>
 
             {/* Delivered To Box */}
-            <div className="text-left p-5 rounded-2xl border border-gold-200 bg-white flex flex-col sm:flex-row justify-between gap-4">
-              <div className="space-y-1 text-xs">
-                <p className="text-[10px] uppercase tracking-wider font-bold text-gold-700">
-                  Shipping To ({confirmedOrder.address.type})
-                </p>
-                <p className="font-bold text-espresso text-sm">{confirmedOrder.address.fullName}</p>
-                <p className="text-espresso/75">
-                  {confirmedOrder.address.houseNo}, {confirmedOrder.address.area}
-                  {confirmedOrder.address.landmark ? `, Near ${confirmedOrder.address.landmark}` : ''}
-                </p>
-                <p className="text-espresso/75">
-                  {confirmedOrder.address.city}, {confirmedOrder.address.state} - {confirmedOrder.address.pincode}
-                </p>
-                <p className="text-espresso/70 font-medium">📞 +91 {confirmedOrder.address.phone}</p>
-              </div>
+            {(() => {
+              const shipAddr = confirmedOrder.shippingAddress || confirmedOrder.address || {};
+              return (
+                <div className="text-left p-5 rounded-2xl border border-gold-200 bg-white flex flex-col sm:flex-row justify-between gap-4">
+                  <div className="space-y-1 text-xs">
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-gold-700">
+                      Shipping To ({shipAddr.type || 'Home'})
+                    </p>
+                    <p className="font-bold text-espresso text-sm">{shipAddr.fullName}</p>
+                    <p className="text-espresso/75">
+                      {shipAddr.houseNo || shipAddr.line1}, {shipAddr.area || shipAddr.line2}
+                      {shipAddr.landmark ? `, Near ${shipAddr.landmark}` : ''}
+                    </p>
+                    <p className="text-espresso/75">
+                      {shipAddr.city}, {shipAddr.state} - {shipAddr.pincode}
+                    </p>
+                    <p className="text-espresso/70 font-medium">📞 +91 {shipAddr.phone}</p>
+                  </div>
 
-              <div className="space-y-1 text-xs sm:text-right">
-                <p className="text-[10px] uppercase tracking-wider font-bold text-gold-700">
-                  Packaging
-                </p>
-                <p className="text-espresso font-medium">Velvet Gift Box • {confirmedOrder.ribbonStyle} Ribbon</p>
-                {confirmedOrder.giftNote && (
-                  <p className="italic text-espresso/60 max-w-xs">"{confirmedOrder.giftNote}"</p>
-                )}
-              </div>
-            </div>
+                  <div className="space-y-1 text-xs sm:text-right">
+                    <p className="text-[10px] uppercase tracking-wider font-bold text-gold-700">
+                      Packaging
+                    </p>
+                    <p className="text-espresso font-medium">Velvet Gift Box • {ribbonStyle} Ribbon</p>
+                    {confirmedOrder.giftNote && (
+                      <p className="italic text-espresso/60 max-w-xs">"{confirmedOrder.giftNote}"</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
@@ -390,8 +484,8 @@ export default function CheckoutPage() {
               </Link>
 
               <a
-                href={`https://wa.me/918780125711?text=${encodeURIComponent(
-                  `Hi AURA Jewels! I just placed Order ${confirmedOrder.id} (₹${confirmedOrder.total}) for delivery to ${confirmedOrder.address.city}. Please share crafting updates!`
+                href={`https://wa.me/${(settings.whatsapp_number || '918780125711').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                  `Hi AURA Jewels! I just placed Order ${confirmedOrder.orderNumber || confirmedOrder.id} (₹${confirmedOrder.totalAmount ?? confirmedOrder.total}) for delivery to ${(confirmedOrder.shippingAddress || confirmedOrder.address || {}).city || 'my city'}. Please share crafting updates!`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -540,13 +634,13 @@ export default function CheckoutPage() {
                       defaultName={user?.name}
                       defaultPhone={user?.phone}
                       onCancel={addresses.length > 0 ? () => setShowAddressForm(false) : null}
-                      onSave={(data) => {
+                      onSave={async (data) => {
                         if (editingAddress) {
-                          updateAddress(editingAddress.id, data);
+                          await updateAddress(editingAddress.id, data);
                           setSelectedAddressId(editingAddress.id);
                         } else {
-                          const created = addAddress(data);
-                          setSelectedAddressId(created.id);
+                          const created = await addAddress(data);
+                          if (created?.id) setSelectedAddressId(created.id);
                         }
                         setEditingAddress(null);
                         setShowAddressForm(false);
@@ -798,67 +892,74 @@ export default function CheckoutPage() {
 
                   {/* Payment Options */}
                   <div className="space-y-3">
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod('razorpay')}
-                      className={`w-full p-4 sm:p-5 rounded-2xl border-2 text-left transition flex items-start gap-3 sm:gap-4 ${
-                        paymentMethod === 'razorpay'
-                          ? 'border-gold-500 bg-gold-50/70 shadow-sm'
-                          : 'border-gold-200 bg-white hover:border-gold-300'
-                      }`}
-                    >
-                      <div className="p-2 sm:p-2.5 rounded-xl bg-white border border-gold-200 text-gold-700 flex-shrink-0">
-                        <CreditCard className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center justify-between gap-1.5">
-                          <span className="font-bold text-xs sm:text-sm text-espresso">
-                            Pay Online (Razorpay / UPI / Cards)
-                          </span>
-                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                            Recommended
-                          </span>
+                    {settings.razorpay_enabled !== false && (
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('razorpay')}
+                        className={`w-full p-4 sm:p-5 rounded-2xl border-2 text-left transition flex items-start gap-3 sm:gap-4 ${
+                          paymentMethod === 'razorpay'
+                            ? 'border-gold-500 bg-gold-50/70 shadow-sm'
+                            : 'border-gold-200 bg-white hover:border-gold-300'
+                        }`}
+                      >
+                        <div className="p-2 sm:p-2.5 rounded-xl bg-white border border-gold-200 text-gold-700 flex-shrink-0">
+                          <CreditCard className="w-5 h-5" />
                         </div>
-                        <p className="text-[11px] sm:text-xs text-espresso/60 mt-1">
-                          Instant UPI, PhonePe, Google Pay, Cards & Netbanking with buyer protection.
-                        </p>
-                      </div>
-                    </button>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center justify-between gap-1.5">
+                            <span className="font-bold text-xs sm:text-sm text-espresso">
+                              Pay Online (Razorpay / UPI / Cards)
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                              Recommended
+                            </span>
+                          </div>
+                          <p className="text-[11px] sm:text-xs text-espresso/60 mt-1">
+                            Instant UPI, PhonePe, Google Pay, Cards & Netbanking with buyer protection.
+                          </p>
+                        </div>
+                      </button>
+                    )}
 
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod('cod')}
-                      className={`w-full p-4 sm:p-5 rounded-2xl border-2 text-left transition flex items-start gap-3 sm:gap-4 ${
-                        paymentMethod === 'cod'
-                          ? 'border-gold-500 bg-gold-50/70 shadow-sm'
-                          : 'border-gold-200 bg-white hover:border-gold-300'
-                      }`}
-                    >
-                      <div className="p-2 sm:p-2.5 rounded-xl bg-white border border-gold-200 text-emerald-700 flex-shrink-0">
-                        <Truck className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="font-bold text-xs sm:text-sm text-espresso block">
-                          Cash on Delivery (COD)
-                        </span>
-                        <p className="text-[11px] sm:text-xs text-espresso/60 mt-1">
-                          Pay via Cash or UPI scanner at your doorstep when parcel arrives.
-                        </p>
-                      </div>
-                    </button>
+                    {settings.cod_enabled !== false && (
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('cod')}
+                        className={`w-full p-4 sm:p-5 rounded-2xl border-2 text-left transition flex items-start gap-3 sm:gap-4 ${
+                          paymentMethod === 'cod'
+                            ? 'border-gold-500 bg-gold-50/70 shadow-sm'
+                            : 'border-gold-200 bg-white hover:border-gold-300'
+                        }`}
+                      >
+                        <div className="p-2 sm:p-2.5 rounded-xl bg-white border border-gold-200 text-emerald-700 flex-shrink-0">
+                          <Truck className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="font-bold text-xs sm:text-sm text-espresso block">
+                            Cash on Delivery (COD)
+                          </span>
+                          <p className="text-[11px] sm:text-xs text-espresso/60 mt-1">
+                            Pay via Cash or UPI scanner at your doorstep when parcel arrives.
+                          </p>
+                        </div>
+                      </button>
+                    )}
                   </div>
 
                   {/* Final Pay CTA */}
                   <button
                     type="button"
+                    disabled={placingOrder}
                     onClick={handlePlaceOrderClick}
-                    className="w-full py-4 px-5 sm:px-6 rounded-full glass-gold-btn text-[11px] sm:text-xs uppercase tracking-[0.14em] sm:tracking-[0.2em] font-bold shadow-luxury flex items-center justify-center gap-2 text-center"
+                    className="w-full py-4 px-5 sm:px-6 rounded-full glass-gold-btn text-[11px] sm:text-xs uppercase tracking-[0.14em] sm:tracking-[0.2em] font-bold shadow-luxury flex items-center justify-center gap-2 text-center disabled:opacity-60"
                   >
                     <ShieldCheck className="w-4 h-4 flex-shrink-0" />
                     <span>
-                      {paymentMethod === 'razorpay'
-                        ? `Pay ₹${grandTotal.toLocaleString('en-IN')} Securely`
-                        : `Confirm COD Order • ₹${grandTotal.toLocaleString('en-IN')}`}
+                      {placingOrder
+                        ? 'Processing Order...'
+                        : paymentMethod === 'razorpay'
+                          ? `Pay ₹${grandTotal.toLocaleString('en-IN')} Securely`
+                          : `Confirm COD Order • ₹${grandTotal.toLocaleString('en-IN')}`}
                     </span>
                   </button>
                 </motion.div>
@@ -941,7 +1042,7 @@ export default function CheckoutPage() {
               {/* Clickable Available Coupon Pills */}
               {!appliedCoupon && (
                 <div className="flex flex-wrap gap-1.5 pt-0.5">
-                  {Object.values(AVAILABLE_COUPONS).map((c) => (
+                  {SAMPLE_COUPON_CODES.map((c) => (
                     <button
                       key={c.code}
                       type="button"
@@ -996,14 +1097,20 @@ export default function CheckoutPage() {
         </div>
       )}
 
-      {/* Simulated Razorpay Gateway Modal */}
+      {/* Razorpay Demo Checkout Modal (when live Razorpay keys are not yet configured in .env) */}
       <RazorpayMockModal
         isOpen={isRazorpayOpen}
         onClose={() => setIsRazorpayOpen(false)}
         amount={grandTotal}
         userEmail={user?.email}
         userPhone={activeAddress?.phone || user?.phone}
-        onPaymentSuccess={(methodLabel) => finalizeOrder(methodLabel, 'Paid')}
+        onPaymentSuccess={() =>
+          finalizeOrder({
+            method: 'razorpay',
+            razorpayOrderId: pendingDemoOrderId || `order_demo_${Date.now()}`,
+            razorpayPaymentId: `pay_demo_${Date.now()}`
+          })
+        }
       />
     </div>
   );

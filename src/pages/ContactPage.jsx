@@ -1,20 +1,37 @@
 import React, { useState } from 'react';
 import { MessageCircle, Phone, Mail, MapPin, Send, HelpCircle } from 'lucide-react';
+import { useStore } from '../context/StoreContext';
+import { useAuth } from '../context/AuthContext';
+import { storefrontApi } from '../services/api';
 
 export default function ContactPage() {
+  const { settings } = useStore();
+  const { showToast } = useAuth();
+  const waNum = (settings.whatsapp_number || '918780125711').replace(/[^0-9]/g, '');
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [msg, setMsg] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSent(true);
-    const text = `*Inquiry from Website Contact Form:*%0A` +
-      `- *Name:* ${name}%0A` +
-      `- *Email:* ${email}%0A` +
-      `- *Message:* ${msg}`;
-    window.open(`https://wa.me/918780125711?text=${text}`, '_blank');
+    setSubmitting(true);
+    try {
+      await storefrontApi.submitContact({
+        name,
+        email,
+        subject: 'Website Contact Inquiry',
+        message: msg
+      });
+      setSent(true);
+      showToast('Inquiry received! Our studio will reply shortly ✨', 'success');
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const faqs = [
@@ -63,7 +80,7 @@ export default function ContactPage() {
                 <MapPin className="w-4 h-4 text-gold-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold text-espresso">Studio Location</p>
-                  <p className="text-espresso/60">Bespoke Artisan Studio, Gujarat, India</p>
+                  <p className="text-espresso/60">{settings.studio_location || 'Bespoke Artisan Studio, Gujarat, India'}</p>
                 </div>
               </div>
 
@@ -71,7 +88,7 @@ export default function ContactPage() {
                 <Phone className="w-4 h-4 text-gold-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold text-espresso">Phone & WhatsApp</p>
-                  <p className="text-espresso/60">+91 8780125711 (Mon-Sat, 10 AM - 7 PM)</p>
+                  <p className="text-espresso/60">+{waNum} (Mon-Sat, 10 AM - 7 PM)</p>
                 </div>
               </div>
 
@@ -79,13 +96,13 @@ export default function ContactPage() {
                 <Mail className="w-4 h-4 text-gold-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold text-espresso">Official Email</p>
-                  <p className="text-espresso/60">support@aurajewels.in</p>
+                  <p className="text-espresso/60">{settings.support_email || 'hello@aurajewels.in'}</p>
                 </div>
               </div>
             </div>
 
             <a
-              href="https://wa.me/918780125711"
+              href={`https://wa.me/${waNum}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-3 px-5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs uppercase tracking-wider font-bold shadow-sm flex items-center justify-center gap-2 transition"

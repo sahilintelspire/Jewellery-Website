@@ -16,9 +16,11 @@ import WishlistPage from './pages/WishlistPage';
 import AuthPage from './pages/AuthPage';
 import CheckoutPage from './pages/CheckoutPage';
 import AccountPage from './pages/AccountPage';
+import AdminPage from './pages/admin/AdminPage';
 import NotFoundPage from './pages/NotFoundPage';
 import { ShippingPolicy, ReturnsPolicy, TermsPage, PrivacyPolicy } from './pages/PolicyPages';
 import { useAuth } from './context/AuthContext';
+import { useStore } from './context/StoreContext';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -70,6 +72,9 @@ function ToastBanner() {
 
 export default function App() {
   const cursorRef = useRef(null);
+  const { pathname } = useLocation();
+  const { settings } = useStore();
+  const isAdminRoute = pathname.startsWith('/admin');
 
   // Zero-rerender GPU-accelerated spotlight tracking via rAF
   useEffect(() => {
@@ -117,10 +122,10 @@ export default function App() {
       />
 
       {/* Top Navbar */}
-      <Navbar />
+      {!isAdminRoute && <Navbar />}
 
       {/* Slide-over Cart Drawer */}
-      <CartDrawer />
+      {!isAdminRoute && <CartDrawer />}
 
       {/* Main Pages Router */}
       <main className="flex-1 relative z-10">
@@ -133,6 +138,7 @@ export default function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/admin" element={<AdminPage />} />
 
           {/* Protected E-Commerce Routes */}
           <Route
@@ -167,19 +173,21 @@ export default function App() {
       <ToastBanner />
 
       {/* Floating WhatsApp Action Pill (Bottom Right) */}
-      <a
-        href="https://wa.me/918780125711?text=Hi!%20I%20have%20a%20question%20about%20your%20handmade%20jewellery!"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 p-3.5 sm:px-4 sm:py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider shadow-2xl flex items-center gap-2 hover:scale-105 transition-all duration-300 border border-emerald-400/40"
-        title="Chat with the Artisan on WhatsApp"
-      >
-        <MessageCircle className="w-5 h-5 fill-white/10" />
-        <span className="hidden sm:inline">WhatsApp Help</span>
-      </a>
+      {!isAdminRoute && (
+        <a
+          href={`https://wa.me/${(settings.whatsapp_number || '918780125711').replace(/[^0-9]/g, '')}?text=Hi!%20I%20have%20a%20question%20about%20your%20handmade%20jewellery!`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 p-3.5 sm:px-4 sm:py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider shadow-2xl flex items-center gap-2 hover:scale-105 transition-all duration-300 border border-emerald-400/40"
+          title="Chat with the Artisan on WhatsApp"
+        >
+          <MessageCircle className="w-5 h-5 fill-white/10" />
+          <span className="hidden sm:inline">WhatsApp Help</span>
+        </a>
+      )}
 
       {/* Footer */}
-      <Footer />
+      {!isAdminRoute && <Footer />}
     </div>
   );
 }

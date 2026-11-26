@@ -9,6 +9,12 @@ dist-ssr/
 .env
 .env.local
 .env.*.local
+server/.env
+
+# Backend data & uploads
+server/data/
+server/uploads/*
+!server/uploads/.gitkeep
 
 # Logs & caches
 logs/
