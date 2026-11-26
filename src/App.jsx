@@ -29,39 +29,42 @@ function ScrollToTop() {
   return null;
 }
 
-// Luxury Animated Floating Toast
+// Luxury Animated Floating Toast (Flex-centered at top so never clipped or blocking bottom CTAs)
 function ToastBanner() {
   const { toast, dismissToast } = useAuth();
 
   return (
-    <AnimatePresence>
-      {toast && (
-        <motion.div
-          key={toast.id}
-          initial={{ opacity: 0, y: 24, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 16, scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 360, damping: 28 }}
-          className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-[60] max-w-md w-[92%] sm:w-auto"
-        >
-          <div className="px-5 py-3.5 rounded-full bg-espresso/95 backdrop-blur-md text-white border border-gold-400/50 shadow-2xl flex items-center gap-3 text-xs font-semibold">
-            {toast.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-            ) : (
-              <Sparkles className="w-4 h-4 text-gold-400 flex-shrink-0" />
-            )}
-            <span className="flex-1">{toast.message}</span>
-            <button
-              type="button"
-              onClick={dismissToast}
-              className="p-0.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div className="fixed top-3 sm:top-5 inset-x-0 z-[70] flex justify-center px-3 sm:px-4 pointer-events-none">
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            key={toast.id}
+            initial={{ opacity: 0, y: -18, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -14, scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+            className="pointer-events-auto max-w-sm sm:max-w-md w-full sm:w-auto"
+          >
+            <div className="px-4 sm:px-5 py-3 rounded-2xl sm:rounded-full bg-espresso/95 backdrop-blur-md text-white border border-gold-400/60 shadow-2xl flex items-center gap-2.5 sm:gap-3 text-xs font-semibold">
+              {toast.type === 'success' ? (
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+              ) : (
+                <Sparkles className="w-4 h-4 text-gold-400 flex-shrink-0" />
+              )}
+              <span className="flex-1 leading-snug break-words">{toast.message}</span>
+              <button
+                type="button"
+                onClick={dismissToast}
+                className="p-1 rounded-full hover:bg-white/15 text-white/70 hover:text-white transition flex-shrink-0"
+                aria-label="Dismiss notification"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
